@@ -3,6 +3,7 @@ mod config;
 mod db;
 mod health;
 mod state;
+mod users;
 
 use state::AppState;
 
