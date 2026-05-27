@@ -15,8 +15,7 @@ async fn main() {
     let state = AppState { db };
     let app = app::router(state);
 
-    let address = format!("{}:{}", config.server_host, config.server_port);
-    let listener = tokio::net::TcpListener::bind(&address)
+    let listener = tokio::net::TcpListener::bind(&config.server_address)
         .await
         .expect("failed to bind backend server");
 
