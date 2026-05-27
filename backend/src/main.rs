@@ -1,8 +1,9 @@
-use axum::{Router, routing::get};
+mod app;
+mod health;
 
 #[tokio::main]
 async fn main() {
-    let app = Router::new().route("/health", get(health_check));
+    let app = app::router();
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8080")
         .await
@@ -11,8 +12,4 @@ async fn main() {
     axum::serve(listener, app)
         .await
         .expect("backend server failed");
-}
-
-async fn health_check() -> &'static str {
-    "ok"
 }
