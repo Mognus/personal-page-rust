@@ -6,8 +6,8 @@ use rand_core::OsRng;
 use sqlx::PgPool;
 
 use crate::users::{
+    dto::{CreateUserRequest, UserResponse},
     error::UserServiceError,
-    model::{CreateUserRequest, UserResponse},
     repository,
 };
 
