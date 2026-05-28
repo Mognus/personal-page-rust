@@ -2,12 +2,11 @@ use axum::{
     Json, Router,
     extract::State,
     http::StatusCode,
-    response::{IntoResponse, Response},
     routing::post,
 };
-use serde::Serialize;
 
 use crate::{
+    error::ApiError,
     state::AppState,
     users::{
         dto::{CreateUserRequest, UserResponse},
@@ -31,25 +30,9 @@ async fn create_user(
     Ok((StatusCode::CREATED, Json(response)))
 }
 
-#[derive(Debug, Serialize)]
-struct ErrorResponse {
-    message: &'static str,
-}
-
-struct ApiError {
-    status: StatusCode,
-    message: &'static str,
-}
-
-impl IntoResponse for ApiError {
-    fn into_response(self) -> Response {
-        (self.status, Json(ErrorResponse { message: self.message })).into_response()
-    }
-}
-
 fn map_service_error(error: UserServiceError) -> ApiError {
     match error {
-        UserServiceError::HashPassword(_) => internal_error(),
+        UserServiceError::HashPassword(_) => ApiError::internal(),
         UserServiceError::Repository(error) => map_repository_error(error),
     }
 }
@@ -58,18 +41,8 @@ fn map_repository_error(error: sqlx::Error) -> ApiError {
     if let sqlx::Error::Database(error) = &error
         && error.constraint() == Some("users_email_key")
     {
-        return ApiError {
-            status: StatusCode::CONFLICT,
-            message: "email already exists",
-        };
+        return ApiError::conflict("email already exists");
     }
 
-    internal_error()
-}
-
-fn internal_error() -> ApiError {
-    ApiError {
-        status: StatusCode::INTERNAL_SERVER_ERROR,
-        message: "internal server error",
-    }
+    ApiError::internal()
 }
