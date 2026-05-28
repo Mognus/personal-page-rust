@@ -29,6 +29,7 @@ pub async fn create_user(
 
     Ok(user.into())
 }
+
 fn hash_password(password: &str) -> Result<String, argon2::password_hash::Error> {
     let salt = SaltString::generate(&mut OsRng);
 
