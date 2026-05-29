@@ -32,6 +32,8 @@ impl std::error::Error for UserRepositoryError {}
 
 impl From<sqlx::Error> for UserRepositoryError {
     fn from(error: sqlx::Error) -> Self {
+        // Postgres exposes unique violations by constraint name; translate that
+        // schema detail into a user-domain error at the repository boundary.
         if let sqlx::Error::Database(database_error) = &error
             && database_error.constraint() == Some("users_email_key")
         {
