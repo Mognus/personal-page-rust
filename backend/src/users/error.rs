@@ -12,11 +12,41 @@ impl std::fmt::Display for InvalidUserRole {
 
 impl std::error::Error for InvalidUserRole {}
 
+// Repository-level errors translate database details into user-domain language.
+#[derive(Debug)]
+pub enum UserRepositoryError {
+    EmailTaken,
+    Database(sqlx::Error),
+}
+
+impl std::fmt::Display for UserRepositoryError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::EmailTaken => write!(formatter, "email already exists"),
+            Self::Database(error) => write!(formatter, "user repository failed: {error}"),
+        }
+    }
+}
+
+impl std::error::Error for UserRepositoryError {}
+
+impl From<sqlx::Error> for UserRepositoryError {
+    fn from(error: sqlx::Error) -> Self {
+        if let sqlx::Error::Database(database_error) = &error
+            && database_error.constraint() == Some("users_email_key")
+        {
+            return Self::EmailTaken;
+        }
+
+        Self::Database(error)
+    }
+}
+
 // Service-level error type that wraps lower-level failures behind one boundary.
 #[derive(Debug)]
 pub enum UserServiceError {
     HashPassword(argon2::password_hash::Error),
-    Repository(sqlx::Error),
+    Repository(UserRepositoryError),
 }
 
 impl std::fmt::Display for UserServiceError {
@@ -36,8 +66,8 @@ impl From<argon2::password_hash::Error> for UserServiceError {
     }
 }
 
-impl From<sqlx::Error> for UserServiceError {
-    fn from(error: sqlx::Error) -> Self {
+impl From<UserRepositoryError> for UserServiceError {
+    fn from(error: UserRepositoryError) -> Self {
         Self::Repository(error)
     }
 }

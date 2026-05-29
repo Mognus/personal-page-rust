@@ -10,7 +10,7 @@ use crate::{
     state::AppState,
     users::{
         dto::{CreateUserRequest, UserResponse},
-        error::UserServiceError,
+        error::{UserRepositoryError, UserServiceError},
         service,
     },
 };
@@ -37,12 +37,9 @@ fn map_service_error(error: UserServiceError) -> ApiError {
     }
 }
 
-fn map_repository_error(error: sqlx::Error) -> ApiError {
-    if let sqlx::Error::Database(error) = &error
-        && error.constraint() == Some("users_email_key")
-    {
-        return ApiError::conflict("email already exists");
+fn map_repository_error(error: UserRepositoryError) -> ApiError {
+    match error {
+        UserRepositoryError::EmailTaken => ApiError::conflict("email already exists"),
+        UserRepositoryError::Database(_) => ApiError::internal(),
     }
-
-    ApiError::internal()
 }
