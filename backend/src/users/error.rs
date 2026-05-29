@@ -16,6 +16,8 @@ impl std::error::Error for InvalidUserRole {}
 #[derive(Debug)]
 pub enum UserRepositoryError {
     EmailTaken,
+    InvalidRole(InvalidUserRole),
+    NotFound,
     Database(sqlx::Error),
 }
 
@@ -23,6 +25,8 @@ impl std::fmt::Display for UserRepositoryError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::EmailTaken => write!(formatter, "email already exists"),
+            Self::InvalidRole(error) => write!(formatter, "invalid persisted user role: {error}"),
+            Self::NotFound => write!(formatter, "user not found"),
             Self::Database(error) => write!(formatter, "user repository failed: {error}"),
         }
     }
