@@ -51,7 +51,8 @@ impl IntoResponse for ApiError {
     }
 }
 
-pub fn log_error_chain(error: &(dyn std::error::Error)) {
+pub fn log_error_chain(error: &dyn std::error::Error) {
+    // Log the top-level error once, then walk source() for lower-level causes.
     tracing::error!(error = %error, "request failed");
 
     let mut source = error.source();
