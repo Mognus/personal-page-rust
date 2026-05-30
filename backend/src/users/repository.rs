@@ -1,17 +1,43 @@
-use sqlx::{PgPool, Row};
+use sqlx::{PgPool, QueryBuilder, Row};
 use uuid::Uuid;
 
 use crate::{
     pagination::Pagination,
     users::{
+        dto::ListUsersQuery,
         error::UserRepositoryError,
         model::{User, UserRole},
     },
 };
 
 pub struct UserListFilters {
-    pub role: Option<UserRole>,
+    pub column_filters: Vec<ColumnFilter>,
     pub search: Option<String>,
+}
+
+pub struct ColumnFilter {
+    pub column: &'static str,
+    pub value: String,
+}
+
+const USER_SEARCH_FIELDS: &[&str] = &["email", "display_name"];
+
+impl From<ListUsersQuery> for UserListFilters {
+    fn from(query: ListUsersQuery) -> Self {
+        let mut column_filters = Vec::new();
+
+        if let Some(role) = query.role {
+            column_filters.push(ColumnFilter {
+                column: "role",
+                value: role.as_str().to_string(),
+            });
+        }
+
+        Self {
+            column_filters,
+            search: query.search,
+        }
+    }
 }
 
 // Create
@@ -84,25 +110,22 @@ pub async fn list_users(
     pagination: Pagination,
     filters: &UserListFilters,
 ) -> Result<Vec<User>, UserRepositoryError> {
-    let role_text = filters.role.map(UserRole::as_str);
-    let search = filters.search.as_deref().map(search_pattern);
-
-    let rows = sqlx::query(
-        r#"
+    let mut builder = QueryBuilder::new(
+        "
         SELECT id, email, display_name, role, created_at, updated_at
         FROM users
-        WHERE ($1 IS NULL OR role = $1)
-          AND ($2 IS NULL OR email ILIKE $2 OR display_name ILIKE $2)
-        ORDER BY created_at DESC
-        LIMIT $3 OFFSET $4
-        "#,
-    )
-    .bind(role_text)
-    .bind(search)
-    .bind(pagination.limit())
-    .bind(pagination.offset())
-    .fetch_all(db)
-    .await?;
+        ",
+    );
+
+    push_user_filters(&mut builder, filters);
+
+    builder
+        .push(" ORDER BY created_at DESC LIMIT ")
+        .push_bind(pagination.limit())
+        .push(" OFFSET ")
+        .push_bind(pagination.offset());
+
+    let rows = builder.build().fetch_all(db).await?;
 
     let mut users = Vec::with_capacity(rows.len());
 
@@ -127,23 +150,39 @@ pub async fn count_users(
     db: &PgPool,
     filters: &UserListFilters,
 ) -> Result<i64, UserRepositoryError> {
-    let role_text = filters.role.map(UserRole::as_str);
-    let search = filters.search.as_deref().map(search_pattern);
+    let mut builder = QueryBuilder::new("SELECT COUNT(*) FROM users");
 
-    let total = sqlx::query_scalar(
-        r#"
-        SELECT COUNT(*)
-        FROM users
-        WHERE ($1 IS NULL OR role = $1)
-          AND ($2 IS NULL OR email ILIKE $2 OR display_name ILIKE $2)
-        "#,
-    )
-    .bind(role_text)
-    .bind(search)
-    .fetch_one(db)
-    .await?;
+    push_user_filters(&mut builder, filters);
+
+    let total = builder.build_query_scalar().fetch_one(db).await?;
 
     Ok(total)
+}
+
+fn push_user_filters(builder: &mut QueryBuilder<'_, sqlx::Postgres>, filters: &UserListFilters) {
+    builder.push(" WHERE true");
+
+    for filter in &filters.column_filters {
+        builder
+            .push(" AND ")
+            .push(filter.column)
+            .push(" = ")
+            .push_bind(&filter.value);
+    }
+
+    if let Some(search) = filters.search.as_deref() {
+        let search = search_pattern(search);
+
+        builder.push(" AND (");
+        for (index, field) in USER_SEARCH_FIELDS.iter().enumerate() {
+            if index > 0 {
+                builder.push(" OR ");
+            }
+
+            builder.push(*field).push(" ILIKE ").push_bind(&search);
+        }
+        builder.push(")");
+    }
 }
 
 fn search_pattern(search: &str) -> String {
