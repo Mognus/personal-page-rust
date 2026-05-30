@@ -50,3 +50,14 @@ impl IntoResponse for ApiError {
         (self.status, Json(ErrorResponse { message: self.message })).into_response()
     }
 }
+
+pub fn log_error_chain(error: &(dyn std::error::Error)) {
+    tracing::error!(error = %error, "request failed");
+
+    let mut source = error.source();
+
+    while let Some(error) = source {
+        tracing::error!(error = %error, "caused by");
+        source = error.source();
+    }
+}

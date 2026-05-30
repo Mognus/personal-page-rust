@@ -7,7 +7,7 @@ use axum::{
 use uuid::Uuid;
 
 use crate::{
-    error::ApiError,
+    error::{ApiError, log_error_chain},
     pagination::PaginatedResponse,
     state::AppState,
     users::{
@@ -90,7 +90,10 @@ async fn delete_user(
 fn map_service_error(error: UserServiceError) -> ApiError {
     // Keep user-to-HTTP mapping at the route boundary; status codes are endpoint policy.
     match error {
-        UserServiceError::HashPassword(_) => ApiError::internal(),
+        error @ UserServiceError::HashPassword(_) => {
+            log_error_chain(&error);
+            ApiError::internal()
+        }
         UserServiceError::Repository(error) => map_repository_error(error),
     }
 }
@@ -99,7 +102,13 @@ fn map_repository_error(error: UserRepositoryError) -> ApiError {
     match error {
         UserRepositoryError::EmailTaken => ApiError::conflict("email already exists"),
         UserRepositoryError::NotFound => ApiError::not_found("user not found"),
-        UserRepositoryError::InvalidRole(_) => ApiError::internal(),
-        UserRepositoryError::Database(_) => ApiError::internal(),
+        error @ UserRepositoryError::InvalidRole(_) => {
+            log_error_chain(&error);
+            ApiError::internal()
+        }
+        error @ UserRepositoryError::Database(_) => {
+            log_error_chain(&error);
+            ApiError::internal()
+        }
     }
 }

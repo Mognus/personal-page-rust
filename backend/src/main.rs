@@ -13,6 +13,8 @@ use state::AppState;
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt::init();
+
     let config = config::Config::from_env();
     let db = db::connect(&config.database_url)
         .await
@@ -23,6 +25,8 @@ async fn main() {
     let listener = tokio::net::TcpListener::bind(&config.server_address)
         .await
         .expect("failed to bind backend server");
+
+    tracing::info!("backend listening on {}", config.server_address);
 
     axum::serve(listener, app)
         .await
