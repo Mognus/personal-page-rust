@@ -3,6 +3,7 @@ mod config;
 mod db;
 mod error;
 mod health;
+mod pagination;
 mod state;
 mod users;
 

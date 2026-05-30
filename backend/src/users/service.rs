@@ -6,10 +6,13 @@ use rand_core::OsRng;
 use sqlx::PgPool;
 use uuid::Uuid;
 
-use crate::users::{
-    dto::{CreateUserRequest, UpdateUserRequest, UserResponse},
-    error::UserServiceError,
-    repository,
+use crate::{
+    pagination::Pagination,
+    users::{
+        dto::{CreateUserRequest, ListUsersQuery, UpdateUserRequest, UserResponse},
+        error::UserServiceError,
+        repository,
+    },
 };
 
 // Create
@@ -39,6 +42,16 @@ pub async fn get_user(db: &PgPool, id: Uuid) -> Result<UserResponse, UserService
     let user = repository::find_user_by_id(db, id).await?;
 
     Ok(user.into())
+}
+
+pub async fn list_users(
+    db: &PgPool,
+    query: ListUsersQuery,
+) -> Result<Vec<UserResponse>, UserServiceError> {
+    let pagination = Pagination::new(query.page, query.page_size);
+    let users = repository::list_users(db, pagination).await?;
+
+    Ok(users.into_iter().map(UserResponse::from).collect())
 }
 
 // Update

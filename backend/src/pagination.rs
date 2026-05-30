@@ -1,0 +1,27 @@
+const DEFAULT_PAGE: u32 = 1;
+const DEFAULT_PAGE_SIZE: u32 = 20;
+const MAX_PAGE_SIZE: u32 = 100;
+
+#[derive(Debug, Clone, Copy)]
+pub struct Pagination {
+    pub page: u32,
+    pub page_size: u32,
+}
+
+impl Pagination {
+    // Normalize raw query params into safe database limit/offset values.
+    pub fn new(page: Option<u32>, page_size: Option<u32>) -> Self {
+        Self {
+            page: page.unwrap_or(DEFAULT_PAGE).max(1),
+            page_size: page_size.unwrap_or(DEFAULT_PAGE_SIZE).clamp(1, MAX_PAGE_SIZE),
+        }
+    }
+
+    pub fn limit(self) -> i64 {
+        i64::from(self.page_size)
+    }
+
+    pub fn offset(self) -> i64 {
+        i64::from(self.page - 1) * i64::from(self.page_size)
+    }
+}

@@ -1,9 +1,12 @@
 use sqlx::{PgPool, Row};
 use uuid::Uuid;
 
-use crate::users::{
-    error::UserRepositoryError,
-    model::{User, UserRole},
+use crate::{
+    pagination::Pagination,
+    users::{
+        error::UserRepositoryError,
+        model::{User, UserRole},
+    },
 };
 
 // Create
@@ -69,6 +72,42 @@ pub async fn find_user_by_id(db: &PgPool, id: Uuid) -> Result<User, UserReposito
         created_at: row.try_get("created_at")?,
         updated_at: row.try_get("updated_at")?,
     })
+}
+
+pub async fn list_users(
+    db: &PgPool,
+    pagination: Pagination,
+) -> Result<Vec<User>, UserRepositoryError> {
+    let rows = sqlx::query(
+        r#"
+        SELECT id, email, display_name, role, created_at, updated_at
+        FROM users
+        ORDER BY created_at DESC
+        LIMIT $1 OFFSET $2
+        "#,
+    )
+    .bind(pagination.limit())
+    .bind(pagination.offset())
+    .fetch_all(db)
+    .await?;
+
+    let mut users = Vec::with_capacity(rows.len());
+
+    for row in rows {
+        let role = row.try_get::<String, _>("role")?;
+        let role = UserRole::try_from(role.as_str()).map_err(UserRepositoryError::InvalidRole)?;
+
+        users.push(User {
+            id: row.try_get("id")?,
+            email: row.try_get("email")?,
+            display_name: row.try_get("display_name")?,
+            role,
+            created_at: row.try_get("created_at")?,
+            updated_at: row.try_get("updated_at")?,
+        });
+    }
+
+    Ok(users)
 }
 
 // Update

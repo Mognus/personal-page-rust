@@ -1,6 +1,6 @@
 use axum::{
     Json, Router,
-    extract::{Path, State},
+    extract::{Path, Query, State},
     http::StatusCode,
     routing::{get, post},
 };
@@ -10,7 +10,7 @@ use crate::{
     error::ApiError,
     state::AppState,
     users::{
-        dto::{CreateUserRequest, UpdateUserRequest, UserResponse},
+        dto::{CreateUserRequest, ListUsersQuery, UpdateUserRequest, UserResponse},
         error::{UserRepositoryError, UserServiceError},
         service,
     },
@@ -18,7 +18,7 @@ use crate::{
 
 pub fn routes() -> Router<AppState> {
     Router::new()
-        .route("/", post(create_user))
+        .route("/", post(create_user).get(list_users))
         .route("/{id}", get(get_user).patch(update_user).delete(delete_user))
 }
 
@@ -42,6 +42,17 @@ async fn get_user(
     Path(id): Path<Uuid>,
 ) -> Result<Json<UserResponse>, ApiError> {
     let response = service::get_user(&state.db, id)
+        .await
+        .map_err(map_service_error)?;
+
+    Ok(Json(response))
+}
+
+async fn list_users(
+    State(state): State<AppState>,
+    Query(query): Query<ListUsersQuery>,
+) -> Result<Json<Vec<UserResponse>>, ApiError> {
+    let response = service::list_users(&state.db, query)
         .await
         .map_err(map_service_error)?;
 
