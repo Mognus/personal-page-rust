@@ -17,7 +17,17 @@ impl std::fmt::Display for AuthServiceError {
     }
 }
 
-impl std::error::Error for AuthServiceError {}
+impl std::error::Error for AuthServiceError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            // Hide whether the email lookup or password verification failed.
+            Self::InvalidCredentials => None,
+            Self::Repository(error) => Some(error),
+            // password_hash::Error is displayed, but not exposed as a std::error source here.
+            Self::VerifyPassword(_) => None,
+        }
+    }
+}
 
 impl From<UserRepositoryError> for AuthServiceError {
     fn from(error: UserRepositoryError) -> Self {

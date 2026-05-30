@@ -32,7 +32,16 @@ impl std::fmt::Display for UserRepositoryError {
     }
 }
 
-impl std::error::Error for UserRepositoryError {}
+impl std::error::Error for UserRepositoryError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::InvalidRole(error) => Some(error),
+            Self::Database(error) => Some(error),
+            // These are domain outcomes; the low-level database detail was intentionally translated.
+            Self::EmailTaken | Self::NotFound => None,
+        }
+    }
+}
 
 impl From<sqlx::Error> for UserRepositoryError {
     fn from(error: sqlx::Error) -> Self {
@@ -64,7 +73,15 @@ impl std::fmt::Display for UserServiceError {
     }
 }
 
-impl std::error::Error for UserServiceError {}
+impl std::error::Error for UserServiceError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            // password_hash::Error is displayed, but not exposed as a std::error source here.
+            Self::HashPassword(_) => None,
+            Self::Repository(error) => Some(error),
+        }
+    }
+}
 
 impl From<argon2::password_hash::Error> for UserServiceError {
     fn from(error: argon2::password_hash::Error) -> Self {
