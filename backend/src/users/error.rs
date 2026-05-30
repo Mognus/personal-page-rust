@@ -52,8 +52,6 @@ impl From<sqlx::Error> for UserRepositoryError {
 #[derive(Debug)]
 pub enum UserServiceError {
     HashPassword(argon2::password_hash::Error),
-    InvalidCredentials,
-    VerifyPassword(argon2::password_hash::Error),
     Repository(UserRepositoryError),
 }
 
@@ -61,8 +59,6 @@ impl std::fmt::Display for UserServiceError {
     fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::HashPassword(error) => write!(formatter, "failed to hash password: {error}"),
-            Self::InvalidCredentials => write!(formatter, "invalid credentials"),
-            Self::VerifyPassword(error) => write!(formatter, "failed to verify password: {error}"),
             Self::Repository(error) => write!(formatter, "user repository failed: {error}"),
         }
     }

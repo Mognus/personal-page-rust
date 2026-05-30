@@ -1,10 +1,10 @@
 use axum::{Json, Router, extract::State, routing::post};
 
 use crate::{
-    auth::{dto::LoginRequest, service},
+    auth::{dto::LoginRequest, error::AuthServiceError, service},
     error::ApiError,
     state::AppState,
-    users::{dto::UserResponse, error::UserServiceError},
+    users::dto::UserResponse,
 };
 
 pub fn routes() -> Router<AppState> {
@@ -22,9 +22,10 @@ async fn login(
     Ok(Json(response))
 }
 
-fn map_service_error(error: UserServiceError) -> ApiError {
+fn map_service_error(error: AuthServiceError) -> ApiError {
+    // Keep auth-to-HTTP mapping at the route boundary; status codes are endpoint policy.
     match error {
-        UserServiceError::InvalidCredentials => ApiError::unauthorized("invalid credentials"),
+        AuthServiceError::InvalidCredentials => ApiError::unauthorized("invalid credentials"),
         _ => ApiError::internal(),
     }
 }

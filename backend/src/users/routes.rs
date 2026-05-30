@@ -88,11 +88,9 @@ async fn delete_user(
 }
 
 fn map_service_error(error: UserServiceError) -> ApiError {
-    // Keep HTTP mapping explicit at the route boundary instead of hiding it in From<ApiError>.
+    // Keep user-to-HTTP mapping at the route boundary; status codes are endpoint policy.
     match error {
         UserServiceError::HashPassword(_) => ApiError::internal(),
-        UserServiceError::InvalidCredentials => ApiError::unauthorized("invalid credentials"),
-        UserServiceError::VerifyPassword(_) => ApiError::internal(),
         UserServiceError::Repository(error) => map_repository_error(error),
     }
 }
