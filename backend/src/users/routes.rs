@@ -11,7 +11,7 @@ use crate::{
     pagination::PaginatedResponse,
     state::AppState,
     users::{
-        dto::{CreateUserRequest, ListUsersQuery, LoginRequest, UpdateUserRequest, UserResponse},
+        dto::{CreateUserRequest, ListUsersQuery, UpdateUserRequest, UserResponse},
         error::{UserRepositoryError, UserServiceError},
         service,
     },
@@ -20,7 +20,6 @@ use crate::{
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/", post(create_user).get(list_users))
-        .route("/login", post(login))
         .route("/{id}", get(get_user).patch(update_user).delete(delete_user))
 }
 
@@ -35,17 +34,6 @@ async fn create_user(
         .map_err(map_service_error)?;
 
     Ok((StatusCode::CREATED, Json(response)))
-}
-
-async fn login(
-    State(state): State<AppState>,
-    Json(request): Json<LoginRequest>,
-) -> Result<Json<UserResponse>, ApiError> {
-    let response = service::login(&state.db, request)
-        .await
-        .map_err(map_service_error)?;
-
-    Ok(Json(response))
 }
 
 // Read

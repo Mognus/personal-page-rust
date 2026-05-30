@@ -1,7 +1,6 @@
 use argon2::{
     Argon2, PasswordHasher,
-    PasswordVerifier,
-    password_hash::{PasswordHash, SaltString},
+    password_hash::SaltString,
 };
 use rand_core::OsRng;
 use sqlx::PgPool;
@@ -10,8 +9,8 @@ use uuid::Uuid;
 use crate::{
     pagination::{PaginatedResponse, Pagination},
     users::{
-        dto::{CreateUserRequest, ListUsersQuery, LoginRequest, UpdateUserRequest, UserResponse},
-        error::{UserRepositoryError, UserServiceError},
+        dto::{CreateUserRequest, ListUsersQuery, UpdateUserRequest, UserResponse},
+        error::UserServiceError,
         repository,
     },
 };
@@ -35,30 +34,6 @@ pub async fn create_user(
     .await?;
 
     Ok(user.into())
-}
-
-pub async fn login(
-    db: &PgPool,
-    request: LoginRequest,
-) -> Result<UserResponse, UserServiceError> {
-    let user = repository::find_user_by_email(db, &request.email)
-        .await
-        .map_err(|error| match error {
-            UserRepositoryError::NotFound => UserServiceError::InvalidCredentials,
-            error => UserServiceError::Repository(error),
-        })?;
-
-    verify_password(&request.password, &user.password_hash)
-        .map_err(|_| UserServiceError::InvalidCredentials)?;
-
-    Ok(UserResponse {
-        id: user.id,
-        email: user.email,
-        display_name: user.display_name,
-        role: user.role,
-        created_at: user.created_at,
-        updated_at: user.updated_at,
-    })
 }
 
 // Read
@@ -122,12 +97,4 @@ fn hash_password(password: &str) -> Result<String, argon2::password_hash::Error>
     Ok(Argon2::default()
         .hash_password(password.as_bytes(), &salt)?
         .to_string())
-}
-
-fn verify_password(password: &str, password_hash: &str) -> Result<(), UserServiceError> {
-    let parsed_hash = PasswordHash::new(password_hash).map_err(UserServiceError::VerifyPassword)?;
-
-    Argon2::default()
-        .verify_password(password.as_bytes(), &parsed_hash)
-        .map_err(UserServiceError::VerifyPassword)
 }
