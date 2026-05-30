@@ -25,6 +25,7 @@ pub struct ListUsersQuery {
     // Query params for GET /users, for example: /users?page=1&page_size=20
     pub page: Option<u32>,
     pub page_size: Option<u32>,
+    pub role: Option<UserRole>,
 }
 
 // Public HTTP shape; keep it separate from the internal User model.

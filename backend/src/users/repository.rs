@@ -9,6 +9,10 @@ use crate::{
     },
 };
 
+pub struct UserListFilters {
+    pub role: Option<UserRole>,
+}
+
 // Create
 
 pub async fn create_user(
@@ -77,15 +81,20 @@ pub async fn find_user_by_id(db: &PgPool, id: Uuid) -> Result<User, UserReposito
 pub async fn list_users(
     db: &PgPool,
     pagination: Pagination,
+    filters: &UserListFilters,
 ) -> Result<Vec<User>, UserRepositoryError> {
+    let role_text = filters.role.map(UserRole::as_str);
+
     let rows = sqlx::query(
         r#"
         SELECT id, email, display_name, role, created_at, updated_at
         FROM users
+        WHERE ($1 IS NULL OR role = $1)
         ORDER BY created_at DESC
-        LIMIT $1 OFFSET $2
+        LIMIT $2 OFFSET $3
         "#,
     )
+    .bind(role_text)
     .bind(pagination.limit())
     .bind(pagination.offset())
     .fetch_all(db)
@@ -108,6 +117,26 @@ pub async fn list_users(
     }
 
     Ok(users)
+}
+
+pub async fn count_users(
+    db: &PgPool,
+    filters: &UserListFilters,
+) -> Result<i64, UserRepositoryError> {
+    let role_text = filters.role.map(UserRole::as_str);
+
+    let total = sqlx::query_scalar(
+        r#"
+        SELECT COUNT(*)
+        FROM users
+        WHERE ($1 IS NULL OR role = $1)
+        "#,
+    )
+    .bind(role_text)
+    .fetch_one(db)
+    .await?;
+
+    Ok(total)
 }
 
 // Update

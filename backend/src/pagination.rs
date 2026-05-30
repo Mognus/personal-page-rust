@@ -33,14 +33,24 @@ pub struct PaginatedResponse<T> {
     pub items: Vec<T>,
     pub page: u32,
     pub page_size: u32,
+    pub total: i64,
+    pub total_pages: i64,
 }
 
 impl<T> PaginatedResponse<T> {
-    pub fn new(items: Vec<T>, pagination: Pagination) -> Self {
+    pub fn new(items: Vec<T>, pagination: Pagination, total: i64) -> Self {
         Self {
             items,
             page: pagination.page,
             page_size: pagination.page_size,
+            total,
+            total_pages: calculate_total_pages(total, pagination.page_size),
         }
     }
+}
+
+fn calculate_total_pages(total: i64, page_size: u32) -> i64 {
+    let page_size = i64::from(page_size);
+
+    (total + page_size - 1) / page_size
 }

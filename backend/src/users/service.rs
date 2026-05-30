@@ -49,10 +49,13 @@ pub async fn list_users(
     query: ListUsersQuery,
 ) -> Result<PaginatedResponse<UserResponse>, UserServiceError> {
     let pagination = Pagination::new(query.page, query.page_size);
-    let users = repository::list_users(db, pagination).await?;
+    let filters = repository::UserListFilters { role: query.role };
+
+    let total = repository::count_users(db, &filters).await?;
+    let users = repository::list_users(db, pagination, &filters).await?;
     let items = users.into_iter().map(UserResponse::from).collect();
 
-    Ok(PaginatedResponse::new(items, pagination))
+    Ok(PaginatedResponse::new(items, pagination, total))
 }
 
 // Update
