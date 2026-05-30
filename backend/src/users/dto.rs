@@ -12,6 +12,14 @@ pub struct CreateUserRequest {
     pub role: UserRole,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct UpdateUserRequest {
+    pub email: Option<String>,
+    pub display_name: Option<String>,
+    pub password: Option<String>,
+    pub role: Option<UserRole>,
+}
+
 #[derive(Debug, Serialize)]
 pub struct UserResponse {
     pub id: Uuid,

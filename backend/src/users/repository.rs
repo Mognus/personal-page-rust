@@ -6,6 +6,8 @@ use crate::users::{
     model::{User, UserRole},
 };
 
+// Create
+
 pub async fn create_user(
     db: &PgPool,
     email: &str,
@@ -41,6 +43,8 @@ pub async fn create_user(
     })
 }
 
+// Read
+
 pub async fn find_user_by_id(db: &PgPool, id: Uuid) -> Result<User, UserRepositoryError> {
     let row = sqlx::query(
         r#"
@@ -65,4 +69,71 @@ pub async fn find_user_by_id(db: &PgPool, id: Uuid) -> Result<User, UserReposito
         created_at: row.try_get("created_at")?,
         updated_at: row.try_get("updated_at")?,
     })
+}
+
+// Update
+
+pub async fn update_user_by_id(
+    db: &PgPool,
+    id: Uuid,
+    email: Option<&str>,
+    display_name: Option<&str>,
+    password_hash: Option<&str>,
+    role: Option<UserRole>,
+) -> Result<User, UserRepositoryError> {
+    let role_text = role.map(UserRole::as_str);
+
+    let row = sqlx::query(
+        r#"
+        UPDATE users
+        SET
+            email = COALESCE($2, email),
+            display_name = COALESCE($3, display_name),
+            password_hash = COALESCE($4, password_hash),
+            role = COALESCE($5, role),
+            updated_at = now()
+        WHERE id = $1
+        RETURNING id, email, display_name, role, created_at, updated_at
+        "#,
+    )
+    .bind(id)
+    .bind(email)
+    .bind(display_name)
+    .bind(password_hash)
+    .bind(role_text)
+    .fetch_optional(db)
+    .await?
+    .ok_or(UserRepositoryError::NotFound)?;
+
+    let role = row.try_get::<String, _>("role")?;
+    let role = UserRole::try_from(role.as_str()).map_err(UserRepositoryError::InvalidRole)?;
+
+    Ok(User {
+        id: row.try_get("id")?,
+        email: row.try_get("email")?,
+        display_name: row.try_get("display_name")?,
+        role,
+        created_at: row.try_get("created_at")?,
+        updated_at: row.try_get("updated_at")?,
+    })
+}
+
+// Delete
+
+pub async fn delete_user_by_id(db: &PgPool, id: Uuid) -> Result<(), UserRepositoryError> {
+    let result = sqlx::query(
+        r#"
+        DELETE FROM users
+        WHERE id = $1
+        "#,
+    )
+    .bind(id)
+    .execute(db)
+    .await?;
+
+    if result.rows_affected() == 0 {
+        return Err(UserRepositoryError::NotFound);
+    }
+
+    Ok(())
 }

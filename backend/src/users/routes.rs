@@ -1,23 +1,28 @@
 use axum::{
     Json, Router,
-    extract::State,
+    extract::{Path, State},
     http::StatusCode,
-    routing::post,
+    routing::{get, post},
 };
+use uuid::Uuid;
 
 use crate::{
     error::ApiError,
     state::AppState,
     users::{
-        dto::{CreateUserRequest, UserResponse},
+        dto::{CreateUserRequest, UpdateUserRequest, UserResponse},
         error::{UserRepositoryError, UserServiceError},
         service,
     },
 };
 
 pub fn routes() -> Router<AppState> {
-    Router::new().route("/", post(create_user))
+    Router::new()
+        .route("/", post(create_user))
+        .route("/{id}", get(get_user).patch(update_user).delete(delete_user))
 }
+
+// Create
 
 async fn create_user(
     State(state): State<AppState>,
@@ -30,7 +35,48 @@ async fn create_user(
     Ok((StatusCode::CREATED, Json(response)))
 }
 
+// Read
+
+async fn get_user(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+) -> Result<Json<UserResponse>, ApiError> {
+    let response = service::get_user(&state.db, id)
+        .await
+        .map_err(map_service_error)?;
+
+    Ok(Json(response))
+}
+
+// Update
+
+async fn update_user(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+    Json(request): Json<UpdateUserRequest>,
+) -> Result<Json<UserResponse>, ApiError> {
+    let response = service::update_user(&state.db, id, request)
+        .await
+        .map_err(map_service_error)?;
+
+    Ok(Json(response))
+}
+
+// Delete
+
+async fn delete_user(
+    State(state): State<AppState>,
+    Path(id): Path<Uuid>,
+) -> Result<StatusCode, ApiError> {
+    service::delete_user(&state.db, id)
+        .await
+        .map_err(map_service_error)?;
+
+    Ok(StatusCode::NO_CONTENT)
+}
+
 fn map_service_error(error: UserServiceError) -> ApiError {
+    // Keep HTTP mapping explicit at the route boundary instead of hiding it in From<ApiError>.
     match error {
         UserServiceError::HashPassword(_) => ApiError::internal(),
         UserServiceError::Repository(error) => map_repository_error(error),
@@ -40,6 +86,8 @@ fn map_service_error(error: UserServiceError) -> ApiError {
 fn map_repository_error(error: UserRepositoryError) -> ApiError {
     match error {
         UserRepositoryError::EmailTaken => ApiError::conflict("email already exists"),
+        UserRepositoryError::NotFound => ApiError::not_found("user not found"),
+        UserRepositoryError::InvalidRole(_) => ApiError::internal(),
         UserRepositoryError::Database(_) => ApiError::internal(),
     }
 }
