@@ -11,7 +11,7 @@ use crate::{
     pagination::{PaginatedResponse, Pagination},
     users::{
         dto::{CreateUserRequest, ListUsersQuery, LoginRequest, UpdateUserRequest, UserResponse},
-        error::UserServiceError,
+        error::{UserRepositoryError, UserServiceError},
         repository,
     },
 };
@@ -41,9 +41,15 @@ pub async fn login(
     db: &PgPool,
     request: LoginRequest,
 ) -> Result<UserResponse, UserServiceError> {
-    let user = repository::find_user_by_email(db, &request.email).await?;
+    let user = repository::find_user_by_email(db, &request.email)
+        .await
+        .map_err(|error| match error {
+            UserRepositoryError::NotFound => UserServiceError::InvalidCredentials,
+            error => UserServiceError::Repository(error),
+        })?;
 
-    verify_password(&request.password, &user.password_hash)?;
+    verify_password(&request.password, &user.password_hash)
+        .map_err(|_| UserServiceError::InvalidCredentials)?;
 
     Ok(UserResponse {
         id: user.id,

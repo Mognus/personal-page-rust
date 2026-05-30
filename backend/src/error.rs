@@ -16,6 +16,13 @@ pub struct ApiError {
 }
 
 impl ApiError {
+    pub fn unauthorized(message: &'static str) -> Self {
+        Self {
+            status: StatusCode::UNAUTHORIZED,
+            message,
+        }
+    }
+
     pub fn conflict(message: &'static str) -> Self {
         Self {
             status: StatusCode::CONFLICT,

@@ -11,7 +11,7 @@ use crate::{
     pagination::PaginatedResponse,
     state::AppState,
     users::{
-        dto::{CreateUserRequest, ListUsersQuery, UpdateUserRequest, UserResponse},
+        dto::{CreateUserRequest, ListUsersQuery, LoginRequest, UpdateUserRequest, UserResponse},
         error::{UserRepositoryError, UserServiceError},
         service,
     },
@@ -20,6 +20,7 @@ use crate::{
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/", post(create_user).get(list_users))
+        .route("/login", post(login))
         .route("/{id}", get(get_user).patch(update_user).delete(delete_user))
 }
 
@@ -34,6 +35,17 @@ async fn create_user(
         .map_err(map_service_error)?;
 
     Ok((StatusCode::CREATED, Json(response)))
+}
+
+async fn login(
+    State(state): State<AppState>,
+    Json(request): Json<LoginRequest>,
+) -> Result<Json<UserResponse>, ApiError> {
+    let response = service::login(&state.db, request)
+        .await
+        .map_err(map_service_error)?;
+
+    Ok(Json(response))
 }
 
 // Read
@@ -91,6 +103,8 @@ fn map_service_error(error: UserServiceError) -> ApiError {
     // Keep HTTP mapping explicit at the route boundary instead of hiding it in From<ApiError>.
     match error {
         UserServiceError::HashPassword(_) => ApiError::internal(),
+        UserServiceError::InvalidCredentials => ApiError::unauthorized("invalid credentials"),
+        UserServiceError::VerifyPassword(_) => ApiError::internal(),
         UserServiceError::Repository(error) => map_repository_error(error),
     }
 }
