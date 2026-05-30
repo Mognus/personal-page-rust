@@ -49,7 +49,10 @@ pub async fn list_users(
     query: ListUsersQuery,
 ) -> Result<PaginatedResponse<UserResponse>, UserServiceError> {
     let pagination = Pagination::new(query.page, query.page_size);
-    let filters = repository::UserListFilters { role: query.role };
+    let filters = repository::UserListFilters {
+        role: query.role,
+        search: query.search,
+    };
 
     let total = repository::count_users(db, &filters).await?;
     let users = repository::list_users(db, pagination, &filters).await?;

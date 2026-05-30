@@ -11,6 +11,7 @@ use crate::{
 
 pub struct UserListFilters {
     pub role: Option<UserRole>,
+    pub search: Option<String>,
 }
 
 // Create
@@ -84,17 +85,20 @@ pub async fn list_users(
     filters: &UserListFilters,
 ) -> Result<Vec<User>, UserRepositoryError> {
     let role_text = filters.role.map(UserRole::as_str);
+    let search = filters.search.as_deref().map(search_pattern);
 
     let rows = sqlx::query(
         r#"
         SELECT id, email, display_name, role, created_at, updated_at
         FROM users
         WHERE ($1 IS NULL OR role = $1)
+          AND ($2 IS NULL OR email ILIKE $2 OR display_name ILIKE $2)
         ORDER BY created_at DESC
-        LIMIT $2 OFFSET $3
+        LIMIT $3 OFFSET $4
         "#,
     )
     .bind(role_text)
+    .bind(search)
     .bind(pagination.limit())
     .bind(pagination.offset())
     .fetch_all(db)
@@ -124,19 +128,26 @@ pub async fn count_users(
     filters: &UserListFilters,
 ) -> Result<i64, UserRepositoryError> {
     let role_text = filters.role.map(UserRole::as_str);
+    let search = filters.search.as_deref().map(search_pattern);
 
     let total = sqlx::query_scalar(
         r#"
         SELECT COUNT(*)
         FROM users
         WHERE ($1 IS NULL OR role = $1)
+          AND ($2 IS NULL OR email ILIKE $2 OR display_name ILIKE $2)
         "#,
     )
     .bind(role_text)
+    .bind(search)
     .fetch_one(db)
     .await?;
 
     Ok(total)
+}
+
+fn search_pattern(search: &str) -> String {
+    format!("%{search}%")
 }
 
 // Update
