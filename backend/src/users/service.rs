@@ -7,7 +7,7 @@ use sqlx::PgPool;
 use uuid::Uuid;
 
 use crate::{
-    pagination::Pagination,
+    pagination::{PaginatedResponse, Pagination},
     users::{
         dto::{CreateUserRequest, ListUsersQuery, UpdateUserRequest, UserResponse},
         error::UserServiceError,
@@ -47,11 +47,12 @@ pub async fn get_user(db: &PgPool, id: Uuid) -> Result<UserResponse, UserService
 pub async fn list_users(
     db: &PgPool,
     query: ListUsersQuery,
-) -> Result<Vec<UserResponse>, UserServiceError> {
+) -> Result<PaginatedResponse<UserResponse>, UserServiceError> {
     let pagination = Pagination::new(query.page, query.page_size);
     let users = repository::list_users(db, pagination).await?;
+    let items = users.into_iter().map(UserResponse::from).collect();
 
-    Ok(users.into_iter().map(UserResponse::from).collect())
+    Ok(PaginatedResponse::new(items, pagination))
 }
 
 // Update

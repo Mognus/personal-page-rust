@@ -8,6 +8,7 @@ use uuid::Uuid;
 
 use crate::{
     error::ApiError,
+    pagination::PaginatedResponse,
     state::AppState,
     users::{
         dto::{CreateUserRequest, ListUsersQuery, UpdateUserRequest, UserResponse},
@@ -51,7 +52,7 @@ async fn get_user(
 async fn list_users(
     State(state): State<AppState>,
     Query(query): Query<ListUsersQuery>,
-) -> Result<Json<Vec<UserResponse>>, ApiError> {
+) -> Result<Json<PaginatedResponse<UserResponse>>, ApiError> {
     let response = service::list_users(&state.db, query)
         .await
         .map_err(map_service_error)?;

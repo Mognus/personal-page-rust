@@ -1,3 +1,5 @@
+use serde::Serialize;
+
 const DEFAULT_PAGE: u32 = 1;
 const DEFAULT_PAGE_SIZE: u32 = 20;
 const MAX_PAGE_SIZE: u32 = 100;
@@ -23,5 +25,22 @@ impl Pagination {
 
     pub fn offset(self) -> i64 {
         i64::from(self.page - 1) * i64::from(self.page_size)
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct PaginatedResponse<T> {
+    pub items: Vec<T>,
+    pub page: u32,
+    pub page_size: u32,
+}
+
+impl<T> PaginatedResponse<T> {
+    pub fn new(items: Vec<T>, pagination: Pagination) -> Self {
+        Self {
+            items,
+            page: pagination.page,
+            page_size: pagination.page_size,
+        }
     }
 }
