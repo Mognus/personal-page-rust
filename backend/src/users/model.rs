@@ -47,3 +47,14 @@ pub struct User {
     pub created_at: DateTime<Utc>,
     pub updated_at: DateTime<Utc>,
 }
+
+#[derive(Debug, Clone)]
+pub struct UserWithPasswordHash {
+    pub id: Uuid,
+    pub email: String,
+    pub display_name: String,
+    pub password_hash: String,
+    pub role: UserRole,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}

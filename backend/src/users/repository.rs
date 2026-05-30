@@ -7,7 +7,7 @@ use crate::{
     users::{
         dto::ListUsersQuery,
         error::UserRepositoryError,
-        model::{User, UserRole},
+        model::{User, UserRole, UserWithPasswordHash},
     },
 };
 
@@ -153,6 +153,36 @@ pub async fn count_users(
     let total = builder.build_query_scalar().fetch_one(db).await?;
 
     Ok(total)
+}
+
+pub async fn find_user_by_email(
+    db: &PgPool,
+    email: &str,
+) -> Result<UserWithPasswordHash, UserRepositoryError> {
+    let row = sqlx::query(
+        r#"
+        SELECT id, email, display_name, password_hash, role, created_at, updated_at
+        FROM users
+        WHERE email = $1
+        "#,
+    )
+    .bind(email)
+    .fetch_optional(db)
+    .await?
+    .ok_or(UserRepositoryError::NotFound)?;
+
+    let role = row.try_get::<String, _>("role")?;
+    let role = UserRole::try_from(role.as_str()).map_err(UserRepositoryError::InvalidRole)?;
+
+    Ok(UserWithPasswordHash {
+        id: row.try_get("id")?,
+        email: row.try_get("email")?,
+        display_name: row.try_get("display_name")?,
+        password_hash: row.try_get("password_hash")?,
+        role,
+        created_at: row.try_get("created_at")?,
+        updated_at: row.try_get("updated_at")?,
+    })
 }
 
 fn push_user_filters(builder: &mut QueryBuilder<sqlx::Postgres>, filters: &UserListFilters) {

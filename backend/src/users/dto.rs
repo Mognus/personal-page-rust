@@ -21,6 +21,12 @@ pub struct UpdateUserRequest {
 }
 
 #[derive(Debug, Deserialize)]
+pub struct LoginRequest {
+    pub email: String,
+    pub password: String,
+}
+
+#[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct ListUsersQuery {
     // Query params for GET /users, for example: /users?page=1&page_size=20
