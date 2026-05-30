@@ -1,7 +1,8 @@
-use sqlx::{PgPool, QueryBuilder, Row};
+use sqlx::{PgPool, QueryBuilder, Row, postgres::PgRow};
 use uuid::Uuid;
 
 use crate::{
+    listing::{ColumnFilter, push_column_filters, push_search_filter},
     pagination::Pagination,
     users::{
         dto::ListUsersQuery,
@@ -13,11 +14,6 @@ use crate::{
 pub struct UserListFilters {
     pub column_filters: Vec<ColumnFilter>,
     pub search: Option<String>,
-}
-
-pub struct ColumnFilter {
-    pub column: &'static str,
-    pub value: String,
 }
 
 const USER_SEARCH_FIELDS: &[&str] = &["email", "display_name"];
@@ -125,7 +121,7 @@ pub async fn list_users(
         .push(" OFFSET ")
         .push_bind(pagination.offset());
 
-    let rows = builder.build().fetch_all(db).await?;
+    let rows: Vec<PgRow> = builder.build().fetch_all(db).await?;
 
     let mut users = Vec::with_capacity(rows.len());
 
@@ -159,34 +155,10 @@ pub async fn count_users(
     Ok(total)
 }
 
-fn push_user_filters(builder: &mut QueryBuilder<'_, sqlx::Postgres>, filters: &UserListFilters) {
+fn push_user_filters(builder: &mut QueryBuilder<sqlx::Postgres>, filters: &UserListFilters) {
     builder.push(" WHERE true");
-
-    for filter in &filters.column_filters {
-        builder
-            .push(" AND ")
-            .push(filter.column)
-            .push(" = ")
-            .push_bind(&filter.value);
-    }
-
-    if let Some(search) = filters.search.as_deref() {
-        let search = search_pattern(search);
-
-        builder.push(" AND (");
-        for (index, field) in USER_SEARCH_FIELDS.iter().enumerate() {
-            if index > 0 {
-                builder.push(" OR ");
-            }
-
-            builder.push(*field).push(" ILIKE ").push_bind(&search);
-        }
-        builder.push(")");
-    }
-}
-
-fn search_pattern(search: &str) -> String {
-    format!("%{search}%")
+    push_column_filters(builder, &filters.column_filters);
+    push_search_filter(builder, filters.search.as_deref(), USER_SEARCH_FIELDS);
 }
 
 // Update
