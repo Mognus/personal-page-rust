@@ -4,6 +4,7 @@ use crate::users::error::UserRepositoryError;
 pub enum AuthServiceError {
     InvalidCredentials,
     Repository(UserRepositoryError),
+    Token(jsonwebtoken::errors::Error),
     VerifyPassword(argon2::password_hash::Error),
 }
 
@@ -12,6 +13,7 @@ impl std::fmt::Display for AuthServiceError {
         match self {
             Self::InvalidCredentials => write!(formatter, "invalid credentials"),
             Self::Repository(error) => write!(formatter, "auth repository failed: {error}"),
+            Self::Token(error) => write!(formatter, "failed to create token: {error}"),
             Self::VerifyPassword(error) => write!(formatter, "failed to verify password: {error}"),
         }
     }
@@ -23,6 +25,7 @@ impl std::error::Error for AuthServiceError {
             // Hide whether the email lookup or password verification failed.
             Self::InvalidCredentials => None,
             Self::Repository(error) => Some(error),
+            Self::Token(error) => Some(error),
             // password_hash::Error is displayed, but not exposed as a std::error source here.
             Self::VerifyPassword(_) => None,
         }
@@ -35,5 +38,11 @@ impl From<UserRepositoryError> for AuthServiceError {
             UserRepositoryError::NotFound => Self::InvalidCredentials,
             error => Self::Repository(error),
         }
+    }
+}
+
+impl From<jsonwebtoken::errors::Error> for AuthServiceError {
+    fn from(error: jsonwebtoken::errors::Error) -> Self {
+        Self::Token(error)
     }
 }
