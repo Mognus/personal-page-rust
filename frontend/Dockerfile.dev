@@ -15,4 +15,5 @@ COPY . .
 
 EXPOSE 3000
 
-CMD ["pnpm", "dev", "--", "--hostname", "0.0.0.0"]
+# Next 16's `next dev` already binds to 0.0.0.0 by default, so no host flag is needed.
+CMD ["pnpm", "dev"]
