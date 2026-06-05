@@ -119,6 +119,7 @@ dependencies = [
  "rand_core 0.6.4",
  "serde",
  "sqlx",
+ "thiserror",
  "tokio",
  "tracing",
  "tracing-subscriber",
