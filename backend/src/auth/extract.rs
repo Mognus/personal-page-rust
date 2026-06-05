@@ -1,10 +1,27 @@
-use axum::{extract::FromRequestParts, http::header::AUTHORIZATION, http::request::Parts};
+use axum::{
+    extract::FromRequestParts,
+    http::{HeaderMap, header::AUTHORIZATION, request::Parts},
+};
 
 use crate::{
     auth::token::{self, Claims},
     error::ApiError,
     state::AppState,
 };
+
+// Shared by the AuthUser extractor and the require_auth middleware: read the
+// bearer token from the headers and verify it, mapping any failure to a 401.
+pub fn authenticate(headers: &HeaderMap, secret: &str) -> Result<Claims, ApiError> {
+    let token = headers
+        .get(AUTHORIZATION)
+        .and_then(|value| value.to_str().ok())
+        .and_then(|header| header.strip_prefix("Bearer "))
+        .ok_or_else(|| ApiError::unauthorized("missing bearer token"))?;
+
+    token::verify_access_token(token, secret)
+        // Map any decode failure to a single opaque 401; details go to the log.
+        .map_err(|_| ApiError::unauthorized("invalid token"))
+}
 
 // Extractor that authenticates a request from its bearer token.
 // Any handler taking `AuthUser` is reachable only with a valid token.
@@ -17,16 +34,7 @@ impl FromRequestParts<AppState> for AuthUser {
         parts: &mut Parts,
         state: &AppState,
     ) -> Result<Self, Self::Rejection> {
-        let token = parts
-            .headers
-            .get(AUTHORIZATION)
-            .and_then(|value| value.to_str().ok())
-            .and_then(|header| header.strip_prefix("Bearer "))
-            .ok_or_else(|| ApiError::unauthorized("missing bearer token"))?;
-
-        let claims = token::verify_access_token(token, &state.jwt_secret)
-            // Map any decode failure to a single opaque 401; details go to the log.
-            .map_err(|_| ApiError::unauthorized("invalid token"))?;
+        let claims = authenticate(&parts.headers, &state.jwt_secret)?;
 
         Ok(Self(claims))
     }
