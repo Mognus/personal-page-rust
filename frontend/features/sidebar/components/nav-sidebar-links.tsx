@@ -28,7 +28,11 @@ export function NavSidebarLinks({
                 const isActive = pathname === item.href;
                 return (
                     <div key={item.href} className={itemClassName}>
-                        <Link href={item.href} data-active={isActive || undefined} className={linkClassName}>
+                        <Link
+                            href={item.href}
+                            data-active={isActive || undefined}
+                            className={linkClassName}
+                        >
                             {item.label}
                         </Link>
                         <div className={underlineClassName} />

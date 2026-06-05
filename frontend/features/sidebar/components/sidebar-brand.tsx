@@ -44,7 +44,11 @@ export function SidebarBrand({
             staticBorder={staticBorder}
             className={className}
         >
-            <SidebarTitle title={title} href={href} className={titleClassName} />
+            <SidebarTitle
+                title={title}
+                href={href}
+                className={titleClassName}
+            />
         </ShockwaveWrapper>
     );
 }

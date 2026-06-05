@@ -11,7 +11,10 @@ export function SidebarToggle({ className }: { className?: string }) {
         <button
             onClick={toggle}
             aria-label={isOpen ? "Close sidebar" : "Open sidebar"}
-            className={className ?? "cursor-pointer text-muted-foreground transition-colors hover:text-foreground"}
+            className={
+                className ??
+                "cursor-pointer text-muted-foreground transition-colors hover:text-foreground"
+            }
         >
             {isOpen ? <X size={20} /> : <Menu size={20} />}
         </button>

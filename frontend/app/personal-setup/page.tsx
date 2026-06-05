@@ -1,3 +1,3 @@
 export default function PersonalSetup() {
-  return <h1>Personal Setup</h1>;
+    return <h1>Personal Setup</h1>;
 }
