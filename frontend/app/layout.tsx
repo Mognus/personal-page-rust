@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist_Mono, Space_Grotesk, Syne } from "next/font/google";
+import { ThemeProvider } from "next-themes";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
 
@@ -35,13 +36,23 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
+        // suppressHydrationWarning: next-themes sets the theme class on <html>
+        // before paint, which would otherwise mismatch the server markup.
         <html
             lang="en"
+            suppressHydrationWarning
             className={`${spaceGrotesk.variable} ${geistMono.variable} ${syne.variable} h-full antialiased`}
         >
             <body className="h-full">
-                {children}
-                <Toaster />
+                <ThemeProvider
+                    attribute="class"
+                    defaultTheme="system"
+                    enableSystem
+                    disableTransitionOnChange
+                >
+                    {children}
+                    <Toaster />
+                </ThemeProvider>
             </body>
         </html>
     );
