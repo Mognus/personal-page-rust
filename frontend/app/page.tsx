@@ -1,10 +1,4 @@
-import CubeScene from "./components/cube-scene";
-
 export default function Home() {
-  // Canvas fills this flex-1 main; the body is a flex column (see layout.tsx).
-  return (
-    <main className="flex-1">
-      <CubeScene />
-    </main>
-  );
+  // The cube now lives in the root layout. Home is just the bare cube for now.
+  return null;
 }

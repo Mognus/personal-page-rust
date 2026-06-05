@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import CubeScene from "@/components/cube-scene";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,12 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="h-full flex flex-col">{children}</body>
+      <body className="h-full">
+        {/* Persistent cube background; survives navigation. */}
+        <CubeScene />
+        {/* Page content layered above the canvas. */}
+        <div className="relative z-10">{children}</div>
+      </body>
     </html>
   );
 }
