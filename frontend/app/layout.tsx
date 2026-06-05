@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Syne } from "next/font/google";
 import { cookies } from "next/headers";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 import { ResponsiveShell } from "@/features/sidebar/components/responsive-shell";
 import { VIEWPORT_COOKIE } from "@/features/sidebar/lib/cookies";
 
@@ -44,6 +45,7 @@ export default async function RootLayout({
                 <ResponsiveShell initialIsMobile={initialIsMobile}>
                     {children}
                 </ResponsiveShell>
+                <Toaster />
             </body>
         </html>
     );
