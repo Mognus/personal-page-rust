@@ -5,26 +5,41 @@ use argon2::{
 use sqlx::PgPool;
 
 use crate::{
-    auth::error::AuthServiceError,
+    auth::{
+        dto::{LoginRequest, LoginResponse},
+        error::AuthServiceError,
+        token,
+    },
     users::{dto::UserResponse, repository},
 };
 
 pub async fn login(
     db: &PgPool,
-    request: crate::auth::dto::LoginRequest,
-) -> Result<UserResponse, AuthServiceError> {
+    request: LoginRequest,
+    jwt_secret: &str,
+    jwt_expires_in_seconds: i64,
+) -> Result<LoginResponse, AuthServiceError> {
     let user = repository::find_user_by_email(db, &request.email).await?;
 
     verify_password(&request.password, &user.password_hash)
         .map_err(|_| AuthServiceError::InvalidCredentials)?;
 
-    Ok(UserResponse {
+    let access_token =
+        token::create_access_token(user.id, user.role, jwt_secret, jwt_expires_in_seconds)?;
+    let user = UserResponse {
         id: user.id,
         email: user.email,
         display_name: user.display_name,
         role: user.role,
         created_at: user.created_at,
         updated_at: user.updated_at,
+    };
+
+    Ok(LoginResponse {
+        access_token,
+        token_type: "Bearer",
+        expires_in: jwt_expires_in_seconds,
+        user,
     })
 }
 

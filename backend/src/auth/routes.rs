@@ -1,10 +1,13 @@
 use axum::{Json, Router, extract::State, routing::post};
 
 use crate::{
-    auth::{dto::LoginRequest, error::AuthServiceError, service},
+    auth::{
+        dto::{LoginRequest, LoginResponse},
+        error::AuthServiceError,
+        service,
+    },
     error::{ApiError, log_error_chain},
     state::AppState,
-    users::dto::UserResponse,
 };
 
 pub fn routes() -> Router<AppState> {
@@ -14,8 +17,13 @@ pub fn routes() -> Router<AppState> {
 async fn login(
     State(state): State<AppState>,
     Json(request): Json<LoginRequest>,
-) -> Result<Json<UserResponse>, ApiError> {
-    let response = service::login(&state.db, request)
+) -> Result<Json<LoginResponse>, ApiError> {
+    let response = service::login(
+        &state.db,
+        request,
+        &state.jwt_secret,
+        state.jwt_expires_in_seconds,
+    )
         .await
         .map_err(map_service_error)?;
 
