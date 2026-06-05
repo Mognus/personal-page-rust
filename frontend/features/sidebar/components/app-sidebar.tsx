@@ -12,13 +12,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
-// The pages the cube projects. Kept simple for now — just navigation links.
-const links = [
-    { href: "/", label: "Home" },
-    { href: "/projects", label: "Projects" },
-    { href: "/personal-setup", label: "Personal Setup" },
-];
+import { links } from "@/features/sidebar/lib/links";
 
 export function AppSidebar() {
     const pathname = usePathname();
