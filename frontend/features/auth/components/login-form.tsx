@@ -1,7 +1,7 @@
 "use client";
 
 import { standardSchemaResolver } from "@hookform/resolvers/standard-schema";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 

@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-
 import type { NavLink } from "@/features/sidebar/lib/links";
+import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 interface NavSidebarLinksProps {
@@ -30,7 +28,7 @@ export function NavSidebarLinks({ items, className }: NavSidebarLinksProps) {
                         <Link
                             href={item.href}
                             data-active={isActive || undefined}
-                            className="peer text-lg font-semibold uppercase tracking-[0.15em] text-muted-foreground transition-colors hover:text-foreground data-[active]:text-foreground"
+                            className="peer text-lg font-semibold tracking-[0.15em] text-muted-foreground uppercase transition-colors hover:text-foreground data-[active]:text-foreground"
                         >
                             {item.label}
                         </Link>

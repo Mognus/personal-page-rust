@@ -1,0 +1,23 @@
+{
+    "Nav": {
+        "projects": "Projekte",
+        "personalSetup": "Persönliches Setup"
+    },
+    "Settings": {
+        "title": "Einstellungen",
+        "theme": "Design",
+        "language": "Sprache",
+        "signOut": "Abmelden"
+    },
+    "Login": {
+        "title": "Anmelden",
+        "description": "Gib deine Zugangsdaten ein, um fortzufahren.",
+        "email": "E-Mail",
+        "password": "Passwort",
+        "submit": "Anmelden",
+        "submitting": "Wird angemeldet…",
+        "invalid": "E-Mail oder Passwort ungültig.",
+        "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+        "welcome": "Willkommen zurück, {name}."
+    }
+}

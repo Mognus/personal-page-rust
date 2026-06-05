@@ -1,12 +1,13 @@
 "use client";
 
 import { LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from "@/i18n/navigation";
 import { toast } from "sonner";
 
 import { Text } from "@/components/typography/text";
 import { logoutAction } from "@/features/auth/actions";
 import { useUserStore } from "@/features/auth/store/user-store";
+import { LanguageSwitcher } from "@/features/settings/components/language-switcher";
 import { ThemeToggle } from "@/features/settings/components/theme-toggle";
 import { useSettingsPanel } from "@/features/settings/store/settings-panel";
 import { cn } from "@/lib/utils";
@@ -43,7 +44,12 @@ export function SettingsPanel({ className }: { className?: string }) {
                 <ThemeToggle />
             </div>
 
-            {/* Language switcher goes here next. */}
+            <div className="flex items-center justify-between gap-4">
+                <Text as="span" variant="eyebrowMuted">
+                    Language
+                </Text>
+                <LanguageSwitcher />
+            </div>
 
             <button
                 onClick={handleLogout}

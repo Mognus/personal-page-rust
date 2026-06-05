@@ -1,8 +1,6 @@
 "use client";
 
 import { Fragment } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import {
     DropdownMenu,
@@ -11,6 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Text } from "@/components/typography/text";
 import { useViewportSize } from "@/hooks/use-media-query";
+import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 interface BreadcrumbsProps {
