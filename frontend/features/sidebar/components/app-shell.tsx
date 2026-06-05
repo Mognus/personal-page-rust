@@ -1,5 +1,6 @@
 "use client";
 
+import { SettingsPanel } from "@/features/settings/components/settings-panel";
 import { AppSidebar } from "@/features/sidebar/components/app-sidebar";
 import { Header } from "@/features/sidebar/components/header";
 import { SocialBar } from "@/features/sidebar/components/social-bar";
@@ -20,6 +21,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <div className="relative min-h-0 flex-1 overflow-y-auto">
                     {children}
                 </div>
+                {/* Floats bottom-right of the content when open. */}
+                <SettingsPanel className="absolute right-0 bottom-0 z-50 min-w-48 border-t border-l border-foreground/60 bg-background p-4" />
             </main>
             <SocialBar
                 socials={SOCIALS}

@@ -2,6 +2,8 @@
 
 import { useEffect } from "react";
 
+import { SidebarUser } from "@/features/auth/components/sidebar-user";
+import { SettingsPanel } from "@/features/settings/components/settings-panel";
 import { Breadcrumbs } from "@/features/sidebar/components/breadcrumbs";
 import { NavSidebarLinks } from "@/features/sidebar/components/nav-sidebar-links";
 import { SidebarBrand } from "@/features/sidebar/components/sidebar-brand";
@@ -42,14 +44,14 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
                             staticBorder
                         />
                     </div>
-                    <div className="fixed top-2/3 left-[5vw] z-50 flex -translate-y-1/2 flex-col">
-                        <NavSidebarLinks
-                            items={links}
-                            className="flex min-w-0 flex-col gap-5"
-                            itemClassName="group flex min-w-0 flex-col gap-1"
-                            linkClassName="peer text-lg font-semibold uppercase tracking-[0.15em] text-muted-foreground transition-colors hover:text-foreground data-[active]:text-foreground"
-                            underlineClassName="h-px w-0 bg-foreground transition-[width] duration-300 group-hover:w-1/4 peer-data-[active]:w-1/4"
-                        />
+                    <div className="fixed top-7/12 left-[5vw] z-50 flex -translate-y-1/2 flex-col">
+                        <NavSidebarLinks items={links} />
+                    </div>
+                    {/* User pinned near the bottom (above the toggle). The group is
+                        bottom-anchored, so the panel opens upward above the user. */}
+                    <div className="fixed bottom-18 left-[5vw] z-50 flex flex-col">
+                        <SettingsPanel className="mb-4 border-l border-foreground/40 pl-3" />
+                        <SidebarUser />
                     </div>
                     <div className="fixed top-2/3 right-[5vw] z-50 -translate-y-1/2">
                         <SocialBar
