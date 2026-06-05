@@ -25,16 +25,19 @@ function Cube() {
 
 // Persistent full-screen scene. Lives in the root layout so it survives
 // navigation; page content is layered on top via z-index.
+//
+// The `fixed` goes on a wrapper, not the Canvas: r3f sizes its renderer from a
+// ResizeObserver, and observing a `position: fixed` element reports 0x0 after a
+// client navigation (the cube vanishes). The Canvas fills this stable wrapper.
 export default function CubeScene() {
     return (
-        <Canvas
-            className="fixed inset-0"
-            camera={{ position: [3, 3, 3], fov: 50 }}
-        >
-            <ambientLight intensity={0.6} />
-            <directionalLight position={[5, 5, 5]} intensity={1} />
-            <Cube />
-            <OrbitControls enablePan={false} />
-        </Canvas>
+        <div className="fixed inset-0">
+            <Canvas camera={{ position: [3, 3, 3], fov: 50 }}>
+                <ambientLight intensity={0.6} />
+                <directionalLight position={[5, 5, 5]} intensity={1} />
+                <Cube />
+                <OrbitControls enablePan={false} />
+            </Canvas>
+        </div>
     );
 }
