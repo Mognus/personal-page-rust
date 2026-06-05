@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Syne } from "next/font/google";
 import "./globals.css";
 import { AppSidebar } from "@/features/sidebar/components/app-sidebar";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SocialBar } from "@/features/sidebar/components/social-bar";
+import { SOCIALS } from "@/features/sidebar/lib/socials";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -11,6 +12,12 @@ const geistSans = Geist({
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+// Display font for the sidebar brand title.
+const syne = Syne({
+  variable: "--font-syne",
   subsets: ["latin"],
 });
 
@@ -27,17 +34,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} h-full antialiased`}
     >
       <body className="h-full">
-        <SidebarProvider>
+        <div className="flex h-screen overflow-hidden">
           <AppSidebar />
           {/* relative so a full-bleed child (e.g. the home cube) can fill it. */}
-          <main className="relative flex-1">
-            <SidebarTrigger className="absolute left-2 top-2 z-10" />
+          <main className="relative min-w-0 flex-1 overflow-hidden">
             {children}
           </main>
-        </SidebarProvider>
+          <SocialBar
+            socials={SOCIALS}
+            className="sidebar-social flex flex-col items-center justify-center gap-6"
+          />
+        </div>
       </body>
     </html>
   );
