@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import CubeScene from "@/components/cube-scene";
+import { AppSidebar } from "@/components/app-sidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,8 +33,15 @@ export default function RootLayout({
       <body className="h-full">
         {/* Persistent cube background; survives navigation. */}
         <CubeScene />
-        {/* Page content layered above the canvas. */}
-        <div className="relative z-10">{children}</div>
+        {/* UI overlay above the canvas. main stays transparent so the cube
+            shows through; only the sidebar panel itself is opaque. */}
+        <SidebarProvider className="relative z-10">
+          <AppSidebar />
+          <main className="flex-1">
+            <SidebarTrigger />
+            {children}
+          </main>
+        </SidebarProvider>
       </body>
     </html>
   );
