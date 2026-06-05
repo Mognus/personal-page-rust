@@ -8,12 +8,10 @@ WORKDIR /app
 
 RUN corepack enable
 
-COPY package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
-
-COPY . .
-
 EXPOSE 3000
 
-# Next 16's `next dev` already binds to 0.0.0.0 by default, so no host flag is needed.
-CMD ["pnpm", "dev"]
+# Dev deps are installed at startup against a named volume (see docker-compose.dev.yml),
+# so dependency changes are picked up on container restart — no image rebuild and no
+# anonymous-volume juggling. Source is bind-mounted, so there's no COPY here.
+# Next 16's `next dev` already binds to 0.0.0.0, so no host flag is needed.
+CMD ["sh", "-c", "pnpm install && pnpm dev"]

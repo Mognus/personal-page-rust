@@ -10,7 +10,9 @@ RUN corepack enable
 
 FROM base AS deps
 
-COPY package.json pnpm-lock.yaml ./
+# pnpm-workspace.yaml carries pnpm settings the lockfile was built with;
+# without it `--frozen-lockfile` sees a config mismatch and fails.
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 RUN pnpm install --frozen-lockfile
 
 FROM base AS builder
