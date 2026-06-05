@@ -51,6 +51,10 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
+    environment:
+      # Pass the backend URL from the root .env into the container so the Next
+      # BFF can reach the backend by its compose service name.
+      BACKEND_URL: ${BACKEND_URL}
     ports:
       - "3000:3000"
     volumes:
