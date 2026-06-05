@@ -12,9 +12,15 @@ interface SocialBarProps {
     isOpen?: boolean;
 }
 
-export function SocialBar({ socials, className, isOpen = true }: SocialBarProps) {
+export function SocialBar({
+    socials,
+    className,
+    isOpen = true,
+}: SocialBarProps) {
     return (
-        <aside className={cn(className, isOpen ? "max-w-16 px-4" : "max-w-0 px-0")}>
+        <aside
+            className={cn(className, isOpen ? "max-w-16 px-4" : "max-w-0 px-0")}
+        >
             {socials.map((s) => (
                 <a
                     key={s.url}
@@ -22,6 +28,7 @@ export function SocialBar({ socials, className, isOpen = true }: SocialBarProps)
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={s.label}
+                    className="text-muted-foreground transition-colors hover:text-foreground"
                 >
                     {s.icon}
                 </a>
