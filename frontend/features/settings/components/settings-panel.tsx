@@ -17,6 +17,7 @@ import { cn } from "@/lib/utils";
 // next; for now it holds logout.
 export function SettingsPanel({ className }: { className?: string }) {
     const { isOpen, close } = useSettingsPanel();
+    const user = useUserStore((s) => s.user);
     const setUser = useUserStore((s) => s.setUser);
     const router = useRouter();
 
@@ -51,15 +52,17 @@ export function SettingsPanel({ className }: { className?: string }) {
                 <LanguageSwitcher />
             </div>
 
-            <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
-            >
-                <LogOut className="h-4 w-4" />
-                <Text as="span" variant="eyebrowMuted">
-                    Sign out
-                </Text>
-            </button>
+            {user && (
+                <button
+                    onClick={handleLogout}
+                    className="flex items-center gap-2 text-muted-foreground transition-colors hover:text-foreground"
+                >
+                    <LogOut className="h-4 w-4" />
+                    <Text as="span" variant="eyebrowMuted">
+                        Sign out
+                    </Text>
+                </button>
+            )}
         </div>
     );
 }

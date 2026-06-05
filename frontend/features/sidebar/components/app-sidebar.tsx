@@ -25,7 +25,10 @@ export function AppSidebar({ isOpen }: { isOpen: boolean }) {
                 <div className="mx-5 mb-6 h-px w-1/2 bg-foreground" />
                 <NavSidebarLinks items={links} className="ml-2 px-5" />
             </div>
-            <SidebarUser className="border-t border-foreground/40 px-5 py-4" />
+            <SidebarUser
+                className="border-t border-foreground/40 px-5 py-4"
+                centerWhenEmpty
+            />
         </aside>
     );
 }
