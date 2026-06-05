@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import CubeScene from "@/components/cube-scene";
 import { AppSidebar } from "@/features/sidebar/components/app-sidebar";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
@@ -31,14 +30,11 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="h-full">
-        {/* Persistent cube background; survives navigation. */}
-        <CubeScene />
-        {/* UI overlay above the canvas. main stays transparent so the cube
-            shows through; only the sidebar panel itself is opaque. */}
-        <SidebarProvider className="relative z-10">
+        <SidebarProvider>
           <AppSidebar />
-          <main className="flex-1">
-            <SidebarTrigger />
+          {/* relative so a full-bleed child (e.g. the home cube) can fill it. */}
+          <main className="relative flex-1">
+            <SidebarTrigger className="absolute left-2 top-2 z-10" />
             {children}
           </main>
         </SidebarProvider>
