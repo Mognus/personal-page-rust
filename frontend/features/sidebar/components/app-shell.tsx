@@ -1,7 +1,7 @@
 "use client";
 
 import { AppSidebar } from "@/features/sidebar/components/app-sidebar";
-import { SidebarToggle } from "@/features/sidebar/components/sidebar-toggle";
+import { Header } from "@/features/sidebar/components/header";
 import { SocialBar } from "@/features/sidebar/components/social-bar";
 import { SOCIALS } from "@/features/sidebar/lib/socials";
 import { useSidebar } from "@/features/sidebar/store/sidebar";
@@ -14,15 +14,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return (
         <div className="flex h-screen overflow-hidden">
             <AppSidebar isOpen={isOpen} />
-            {/* relative so a full-bleed child (e.g. the home cube) can fill it. */}
-            <main className="relative min-w-0 flex-1 overflow-hidden">
-                <SidebarToggle className="absolute left-3 top-3 z-10 cursor-pointer text-muted-foreground transition-colors hover:text-foreground" />
-                {children}
+            <main className="relative flex min-w-0 flex-1 flex-col overflow-hidden">
+                <Header />
+                {/* relative so a full-bleed child (e.g. the home cube) can fill it. */}
+                <div className="relative min-h-0 flex-1 overflow-y-auto">
+                    {children}
+                </div>
             </main>
             <SocialBar
                 socials={SOCIALS}
                 isOpen={isOpen}
-                className="sidebar-social flex flex-col items-center justify-center gap-6"
+                className="flex shrink-0 flex-col items-center justify-center gap-6 overflow-hidden border-l border-foreground/60 transition-[max-width,padding] duration-[600ms]"
             />
         </div>
     );
