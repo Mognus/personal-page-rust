@@ -137,14 +137,15 @@
 }
 
 @layer components {
-  /* Content-driven width: aside shrinks to its widest child. */
+  /* Content-driven width: aside shrinks to its widest child.
+     max-width animates on collapse. */
   .sidebar-nav {
-    @apply shrink-0 overflow-hidden border-r border-foreground/60 font-syne;
+    @apply shrink-0 overflow-hidden border-r border-foreground/60 font-syne transition-[max-width,padding] duration-[600ms];
   }
 
   /* Social rail on the far right. */
   .sidebar-social {
-    @apply shrink-0 overflow-hidden border-l border-foreground/60;
+    @apply shrink-0 overflow-hidden border-l border-foreground/60 transition-[max-width,padding] duration-[600ms];
   }
 
   .sidebar-social a {

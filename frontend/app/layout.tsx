@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Syne } from "next/font/google";
 import "./globals.css";
-import { AppSidebar } from "@/features/sidebar/components/app-sidebar";
-import { SocialBar } from "@/features/sidebar/components/social-bar";
-import { SOCIALS } from "@/features/sidebar/lib/socials";
+import { AppShell } from "@/features/sidebar/components/app-shell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -37,17 +35,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${syne.variable} h-full antialiased`}
     >
       <body className="h-full">
-        <div className="flex h-screen overflow-hidden">
-          <AppSidebar />
-          {/* relative so a full-bleed child (e.g. the home cube) can fill it. */}
-          <main className="relative min-w-0 flex-1 overflow-hidden">
-            {children}
-          </main>
-          <SocialBar
-            socials={SOCIALS}
-            className="sidebar-social flex flex-col items-center justify-center gap-6"
-          />
-        </div>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );

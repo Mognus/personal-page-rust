@@ -1,12 +1,14 @@
 import { NavSidebarLinks } from "@/features/sidebar/components/nav-sidebar-links";
 import { SidebarBrand } from "@/features/sidebar/components/sidebar-brand";
 import { links } from "@/features/sidebar/lib/links";
+import { cn } from "@/lib/utils";
 
 // Content-driven sidebar: the aside shrinks to its widest child (the brand),
-// so the divider and links line up against that width.
-export function AppSidebar() {
+// so the divider and links line up against that width. `isOpen` collapses it
+// to zero width (overflow clipped) for the toggle.
+export function AppSidebar({ isOpen }: { isOpen: boolean }) {
     return (
-        <aside className="sidebar-nav flex flex-col">
+        <aside className={cn("sidebar-nav flex flex-col", isOpen ? "max-w-3xl" : "max-w-0")}>
             <SidebarBrand
                 targetW={300}
                 targetH={150}
