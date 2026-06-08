@@ -34,7 +34,7 @@ services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     environment:
       SERVER_HOST: ${SERVER_HOST:-0.0.0.0}
       SERVER_PORT: ${SERVER_PORT:-8080}
@@ -43,6 +43,12 @@ services:
       JWT_EXPIRES_IN_SECONDS: ${JWT_EXPIRES_IN_SECONDS:-3600}
     ports:
       - "${SERVER_PORT:-8080}:8080"
+    volumes:
+      # Bind-mount the source so cargo-watch sees changes (hot-reload).
+      - ./backend:/app
+      # Build cache in a named volume: fast incremental builds, and no
+      # root-owned target/ leaking onto the host bind mount.
+      - backend_target:/app/target
     depends_on:
       migrate:
         condition: service_completed_successfully
@@ -74,6 +80,7 @@ services:
 
 volumes:
   postgres_data:
+  backend_target:
   frontend_node_modules:
   frontend_next:
   pnpm_store:

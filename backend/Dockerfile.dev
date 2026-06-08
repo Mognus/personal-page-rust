@@ -2,7 +2,12 @@ FROM rust:1-slim-bookworm
 
 WORKDIR /app
 
+# cargo-watch gives hot-reload: it recompiles and restarts on source changes.
+RUN cargo install cargo-watch --locked
+
+# The source is bind-mounted at runtime (see docker-compose.dev.yml); these
+# COPYs just keep the image buildable on its own.
 COPY Cargo.toml Cargo.lock ./
 COPY src ./src
 
-CMD ["cargo", "run"]
+CMD ["cargo", "watch", "-x", "run"]
