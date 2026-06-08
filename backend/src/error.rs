@@ -37,6 +37,13 @@ impl ApiError {
         }
     }
 
+    pub fn forbidden(message: &'static str) -> Self {
+        Self {
+            status: StatusCode::FORBIDDEN,
+            message,
+        }
+    }
+
     pub fn internal() -> Self {
         Self {
             status: StatusCode::INTERNAL_SERVER_ERROR,
