@@ -1,9 +1,9 @@
 import { notFound } from "next/navigation";
 
+import { AdminDataTable } from "@/features/admin/components/admin-data-table";
 import { fetchAdminList } from "@/features/admin/lib/list";
 import { getAdminResource } from "@/features/admin/lib/resources";
 import type { AdminRecord } from "@/features/admin/lib/types";
-import { ModelTableClient } from "./model-table-client";
 
 interface Props {
     params: Promise<{ model: string }>;
@@ -45,9 +45,9 @@ export default async function ModelPage({ params, searchParams }: Props) {
                     {failed ? "Failed to load." : `${total} entries`}
                 </p>
             </div>
-            <ModelTableClient
+            <AdminDataTable
+                resource={model}
                 schema={resource.schema}
-                model={model}
                 rows={rows}
                 total={total}
                 className="min-h-0 flex-1"
