@@ -35,15 +35,8 @@ impl From<sqlx::Error> for UserRepositoryError {
 // Service-level error type that wraps lower-level failures behind one boundary.
 #[derive(Debug, thiserror::Error)]
 pub enum UserServiceError {
-    // password_hash::Error is displayed, but not exposed as a std::error source here.
     #[error("failed to hash password: {0}")]
-    HashPassword(argon2::password_hash::Error),
+    HashPassword(#[from] argon2::password_hash::Error),
     #[error("user repository failed: {0}")]
     Repository(#[from] UserRepositoryError),
-}
-
-impl From<argon2::password_hash::Error> for UserServiceError {
-    fn from(error: argon2::password_hash::Error) -> Self {
-        Self::HashPassword(error)
-    }
 }
