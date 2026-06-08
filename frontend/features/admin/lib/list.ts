@@ -10,8 +10,9 @@ interface PaginatedResponse {
 interface ListParams {
     page?: number;
     pageSize?: number;
-    search?: string;
-    role?: string;
+    // Generic, model-agnostic: any column/search filter (e.g. search, role).
+    // The backend accepts the params it knows and rejects unknown ones.
+    filters?: Record<string, string>;
 }
 
 export interface AdminList {
@@ -25,17 +26,16 @@ export async function fetchAdminList(
     apiPath: string,
     params: ListParams = {},
 ): Promise<AdminList> {
-    const { page = 1, pageSize = 20, search, role } = params;
+    const { page = 1, pageSize = 20, filters = {} } = params;
 
     const query = new URLSearchParams({
         page: String(page),
         page_size: String(pageSize),
     });
-    if (search) query.set("search", search);
-    if (role) query.set("role", role);
+    for (const [key, value] of Object.entries(filters)) {
+        if (value) query.set(key, value);
+    }
 
-    const res = await callApi<PaginatedResponse>(
-        `${apiPath}?${query.toString()}`,
-    );
+    const res = await callApi<PaginatedResponse>(`${apiPath}?${query.toString()}`);
     return { rows: res.items, total: res.total };
 }

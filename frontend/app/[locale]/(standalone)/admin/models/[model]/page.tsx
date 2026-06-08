@@ -19,6 +19,15 @@ export default async function ModelPage({ params, searchParams }: Props) {
     const page = sp.page ? Number(sp.page) : 1;
     const limit = sp.limit ? Number(sp.limit) : 20;
 
+    // Everything other than page/limit is forwarded to the backend as a filter
+    // (search, role, …); the backend takes what it knows and rejects the rest.
+    const filters = Object.fromEntries(
+        Object.entries(sp).filter(
+            ([key, value]) =>
+                value !== undefined && key !== "page" && key !== "limit",
+        ),
+    ) as Record<string, string>;
+
     let rows: AdminRecord[] = [];
     let total = 0;
     let failed = false;
@@ -26,8 +35,7 @@ export default async function ModelPage({ params, searchParams }: Props) {
         const list = await fetchAdminList(resource.apiPath, {
             page,
             pageSize: limit,
-            search: sp.search,
-            role: sp.role,
+            filters,
         });
         rows = list.rows;
         total = list.total;
