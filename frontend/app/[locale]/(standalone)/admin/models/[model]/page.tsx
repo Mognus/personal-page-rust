@@ -31,7 +31,10 @@ export default async function ModelPage({ params, searchParams }: Props) {
         });
         rows = list.rows;
         total = list.total;
-    } catch {
+    } catch (error) {
+        // Server component → can't toast (Sonner is client-side); log it so the
+        // real failure is visible in the server output, UI degrades gracefully.
+        console.error("admin list fetch failed", error);
         failed = true;
     }
 
