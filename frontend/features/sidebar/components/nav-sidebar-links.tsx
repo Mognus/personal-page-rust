@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import type { NavLink } from "@/features/sidebar/lib/links";
 import { Link, usePathname } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -13,6 +15,7 @@ interface NavSidebarLinksProps {
 
 export function NavSidebarLinks({ items, className }: NavSidebarLinksProps) {
     const pathname = usePathname();
+    const t = useTranslations("Nav");
 
     return (
         <nav className={cn("flex min-w-0 flex-col gap-5", className)}>
@@ -30,7 +33,7 @@ export function NavSidebarLinks({ items, className }: NavSidebarLinksProps) {
                             data-active={isActive || undefined}
                             className="peer text-lg font-semibold tracking-[0.15em] text-muted-foreground uppercase transition-colors hover:text-foreground data-[active]:text-foreground"
                         >
-                            {item.label}
+                            {t(item.labelKey)}
                         </Link>
                         <div className="h-px w-0 bg-foreground transition-[width] duration-300 group-hover:w-1/4 peer-data-[active]:w-1/4" />
                     </div>

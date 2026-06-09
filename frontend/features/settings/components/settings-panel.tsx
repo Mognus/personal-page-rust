@@ -1,6 +1,7 @@
 "use client";
 
 import { LogOut } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { toast } from "sonner";
 
@@ -20,6 +21,7 @@ export function SettingsPanel({ className }: { className?: string }) {
     const user = useUserStore((s) => s.user);
     const setUser = useUserStore((s) => s.setUser);
     const router = useRouter();
+    const t = useTranslations("Settings");
 
     if (!isOpen) return null;
 
@@ -27,7 +29,7 @@ export function SettingsPanel({ className }: { className?: string }) {
         close();
         await logoutAction();
         setUser(null);
-        toast.success("Signed out.");
+        toast.success(t("signedOut"));
         router.push("/login");
         router.refresh();
     }
@@ -35,19 +37,19 @@ export function SettingsPanel({ className }: { className?: string }) {
     return (
         <div className={cn("flex flex-col gap-3", className)}>
             <Text as="span" variant="eyebrowMuted">
-                Settings
+                {t("title")}
             </Text>
 
             <div className="flex items-center justify-between gap-4">
                 <Text as="span" variant="eyebrowMuted">
-                    Theme
+                    {t("theme")}
                 </Text>
                 <ThemeToggle />
             </div>
 
             <div className="flex items-center justify-between gap-4">
                 <Text as="span" variant="eyebrowMuted">
-                    Language
+                    {t("language")}
                 </Text>
                 <LanguageSwitcher />
             </div>
@@ -59,7 +61,7 @@ export function SettingsPanel({ className }: { className?: string }) {
                 >
                     <LogOut className="h-4 w-4" />
                     <Text as="span" variant="eyebrowMuted">
-                        Sign out
+                        {t("signOut")}
                     </Text>
                 </button>
             )}
