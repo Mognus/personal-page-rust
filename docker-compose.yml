@@ -49,6 +49,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    environment:
+      BACKEND_URL: ${BACKEND_URL}
+      # GitHub access for the projects + personal-setup views (server-side only).
+      GITHUB_DOTFILES_REPO: ${GITHUB_DOTFILES_REPO}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
     ports:
       - "3000:3000"
     depends_on:
