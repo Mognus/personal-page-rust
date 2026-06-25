@@ -1,6 +1,7 @@
 mod auth;
 mod app;
 mod config;
+mod configs;
 mod db;
 mod error;
 mod health;
