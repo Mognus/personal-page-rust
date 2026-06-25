@@ -164,3 +164,25 @@
 .spin-paused {
     animation-play-state: paused;
 }
+
+/* Gentle drift for the floating config buttons on the personal-setup grid.
+   Amplitude comes from --float-x / --float-y set inline per element. */
+@keyframes float-x {
+    0%,
+    100% {
+        transform: translateX(0px);
+    }
+    50% {
+        transform: translateX(var(--float-x, 5px));
+    }
+}
+
+@keyframes float-y {
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(var(--float-y, -7px));
+    }
+}
