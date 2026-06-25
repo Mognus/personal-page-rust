@@ -14,7 +14,9 @@ import type {
 } from "@/features/admin/lib/types";
 import { useRouter } from "@/i18n/navigation";
 
-type Values = Record<string, string>;
+// Values are typed per field (boolean/number/string) so the JSON payload
+// matches what the backend deserializes — not everything-as-string.
+type Values = Record<string, unknown>;
 
 interface AdminFormProps {
     resource: string;
@@ -46,8 +48,16 @@ export function AdminForm({
 
     const defaultValues: Values = Object.fromEntries(
         fields.map((f) => {
+            // Normalize a persisted value to the input's type so edits round-trip.
             const v = record?.[f.name];
-            if (v !== undefined && v !== null) return [f.name, String(v)];
+            if (v !== undefined && v !== null) {
+                if (f.type === "boolean") return [f.name, Boolean(v)];
+                if (f.type === "number") return [f.name, Number(v)];
+                return [f.name, String(v)];
+            }
+            if (f.default !== undefined) return [f.name, f.default];
+            if (f.type === "boolean") return [f.name, false];
+            if (f.type === "number") return [f.name, ""];
             if (f.type === "enum") return [f.name, f.options?.[0]?.value ?? ""];
             return [f.name, ""];
         }),
@@ -97,11 +107,22 @@ export function AdminForm({
                                 </option>
                             ))}
                         </select>
+                    ) : field.type === "boolean" ? (
+                        <input
+                            id={field.name}
+                            type="checkbox"
+                            {...register(field.name)}
+                            className="h-4 w-4 self-start border border-input bg-background"
+                        />
                     ) : (
                         <Input
                             id={field.name}
                             type={
-                                field.name === "password" ? "password" : "text"
+                                field.type === "number"
+                                    ? "number"
+                                    : field.name === "password"
+                                      ? "password"
+                                      : "text"
                             }
                             autoComplete={
                                 field.name === "password"
@@ -110,6 +131,8 @@ export function AdminForm({
                             }
                             {...register(field.name, {
                                 required: field.required,
+                                // Send a real number, not the input's string.
+                                valueAsNumber: field.type === "number",
                             })}
                         />
                     )}

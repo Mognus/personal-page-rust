@@ -5,6 +5,8 @@ export interface AdminField {
     required?: boolean;
     readonly?: boolean;
     options?: { value: string; label: string }[];
+    // Default for the create form when there's no record (e.g. visible: true).
+    default?: unknown;
     // Visibility per surface (forms come later; table reads tableHidden).
     tableHidden?: boolean;
     editHidden?: boolean;
