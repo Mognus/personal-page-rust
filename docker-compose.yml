@@ -1,22 +1,24 @@
 services:
   postgres:
     image: postgres:18-alpine
+    container_name: ${PROJECT_NAME:-personal-page}-postgres
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-personal_page}
       POSTGRES_USER: ${POSTGRES_USER:-personal_page}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-personal_page}
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
+    # No host port published in prod — only reached over the compose network.
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
+    restart: always
 
   migrate:
     image: rust:1-slim-bookworm
+    container_name: ${PROJECT_NAME:-personal-page}-migrate
     working_dir: /app
     volumes:
       - ./backend:/app
@@ -28,36 +30,42 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+    # One-shot: runs migrations and exits, so no restart policy.
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    container_name: ${PROJECT_NAME:-personal-page}-backend
     environment:
       SERVER_HOST: ${SERVER_HOST:-0.0.0.0}
       SERVER_PORT: ${SERVER_PORT:-8080}
       DATABASE_URL: postgres://${POSTGRES_USER:-personal_page}:${POSTGRES_PASSWORD:-personal_page}@postgres:5432/${POSTGRES_DB:-personal_page}
       JWT_SECRET: ${JWT_SECRET:-change_me}
       JWT_EXPIRES_IN_SECONDS: ${JWT_EXPIRES_IN_SECONDS:-3600}
-    ports:
-      - "${SERVER_PORT:-8080}:8080"
+    # No host port: the frontend BFF reaches it as http://backend:8080 over the
+    # compose network; the browser never talks to it directly.
     depends_on:
       migrate:
         condition: service_completed_successfully
+    restart: always
 
   frontend:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+    container_name: ${PROJECT_NAME:-personal-page}-frontend
     environment:
-      BACKEND_URL: ${BACKEND_URL}
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8080}
       # GitHub access for the projects + personal-setup views (server-side only).
       GITHUB_DOTFILES_REPO: ${GITHUB_DOTFILES_REPO}
       GITHUB_TOKEN: ${GITHUB_TOKEN}
     ports:
+      # Only the frontend is published; nginx proxies the domain to it.
       - "3000:3000"
     depends_on:
       - backend
+    restart: always
 
 volumes:
   postgres_data:

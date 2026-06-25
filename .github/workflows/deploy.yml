@@ -1,0 +1,36 @@
+name: Deploy
+
+on:
+  push:
+    branches: [master]
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Secrets live on the server, never in the repo. Copy them into .env so
+      # docker compose picks them up (POSTGRES_*, JWT_SECRET, BACKEND_URL,
+      # GITHUB_*). Adjust the path if the env file is named differently.
+      - name: Copy .env
+        run: cp ~/personal-page.env .env
+
+      - name: Backup database
+        run: |
+          set -a; . ./.env; set +a
+          mkdir -p ~/backups
+          docker exec ${PROJECT_NAME:-personal-page}-postgres \
+            pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB" \
+            | gzip > ~/backups/db-$(date +%Y%m%d-%H%M%S).sql.gz
+          ls -t ~/backups/db-*.sql.gz | tail -n +8 | xargs -r rm
+        continue-on-error: true
+
+      - name: Build and deploy
+        run: |
+          docker compose -f docker-compose.yml build
+          docker compose -f docker-compose.yml up -d
+
+      - name: Cleanup old images
+        run: docker image prune -f
