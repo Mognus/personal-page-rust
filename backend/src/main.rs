@@ -6,6 +6,7 @@ mod error;
 mod health;
 mod listing;
 mod pagination;
+mod projects;
 mod state;
 mod users;
 
