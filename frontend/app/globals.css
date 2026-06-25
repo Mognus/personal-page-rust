@@ -144,3 +144,23 @@
         opacity: 0;
     }
 }
+
+/* Rotating enso ring on the projects page. counter-spin keeps the orbiting
+   cards upright; spin-paused freezes both when a project is open. */
+@keyframes spin {
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.spin {
+    animation: spin var(--spin-duration, 60s) linear infinite;
+}
+
+.counter-spin {
+    animation: spin var(--spin-duration, 60s) linear infinite reverse;
+}
+
+.spin-paused {
+    animation-play-state: paused;
+}

@@ -20,5 +20,21 @@
         "invalid": "Invalid email or password.",
         "error": "Something went wrong. Please try again.",
         "welcome": "Welcome back, {name}."
+    },
+    "Projects": {
+        "back": "Back",
+        "showDetails": "Show Details",
+        "showReadme": "Show README",
+        "noDescription": "No description provided on GitHub.",
+        "languages": "Languages",
+        "updated": "Updated",
+        "topics": "Topics",
+        "noTopics": "No topics",
+        "viewRepository": "View Repository",
+        "unknown": "Unknown"
+    },
+    "ContentRenderer": {
+        "rendered": "Rendered",
+        "raw": "Raw"
     }
 }

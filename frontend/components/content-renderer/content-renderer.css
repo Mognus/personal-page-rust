@@ -1,0 +1,68 @@
+@reference "../../app/globals.css";
+
+@layer components {
+    html.dark .content-renderer-highlight .shiki,
+    html.dark .content-renderer-highlight .shiki span {
+        color: var(--shiki-dark) !important;
+        font-style: var(--shiki-dark-font-style) !important;
+        font-weight: var(--shiki-dark-font-weight) !important;
+        text-decoration: var(--shiki-dark-text-decoration) !important;
+    }
+
+    .content-renderer-highlight pre.shiki {
+        @apply min-w-full overflow-x-auto leading-6 text-[clamp(0.625rem,0.75vw,0.75rem)];
+        background-color: transparent !important;
+    }
+
+    .content-renderer-highlight code.shiki {
+        background-color: transparent !important;
+    }
+
+    .content-renderer-plain {
+        @apply min-w-full whitespace-pre leading-6 text-[clamp(0.625rem,0.75vw,0.75rem)] text-foreground;
+    }
+
+    .content-renderer-markdown {
+        @apply text-[clamp(0.75rem,0.9vw,0.875rem)] leading-7 text-foreground;
+    }
+
+    .content-renderer-markdown h1 {
+        @apply text-[clamp(1.25rem,2vw,1.75rem)] uppercase tracking-[0.12em];
+    }
+
+    .content-renderer-markdown h2 {
+        @apply mt-6 text-[clamp(1rem,1.35vw,1.25rem)] uppercase tracking-[0.12em];
+    }
+
+    .content-renderer-markdown h3 {
+        @apply mt-5 text-[clamp(0.875rem,1.1vw,1rem)] uppercase tracking-[0.18em] text-foreground;
+    }
+
+    .content-renderer-markdown p {
+        @apply mt-3 text-muted-foreground;
+    }
+
+    .content-renderer-markdown ul {
+        @apply mt-3 ml-5 flex flex-col gap-2 list-disc text-muted-foreground;
+    }
+
+    .content-renderer-markdown strong {
+        @apply text-foreground font-semibold;
+    }
+
+    .content-renderer-markdown em {
+        @apply italic;
+    }
+
+    .content-renderer-markdown code {
+        @apply px-1 py-0.5 bg-foreground/10 text-foreground;
+    }
+
+    .content-renderer-markdown pre {
+        @apply mt-4 overflow-x-auto border border-foreground/20 bg-background p-4;
+    }
+
+    .content-renderer-markdown pre code {
+        @apply bg-transparent p-0;
+    }
+}

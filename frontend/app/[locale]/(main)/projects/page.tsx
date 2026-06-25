@@ -1,3 +1,5 @@
+// No active project: the layout's enso spins on its own. Content appears only
+// on /projects/[slug], slotted into the layout's children.
 export default function Projects() {
-    return <h1>Projects</h1>;
+    return null;
 }

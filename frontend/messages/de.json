@@ -20,5 +20,21 @@
         "invalid": "E-Mail oder Passwort ungültig.",
         "error": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
         "welcome": "Willkommen zurück, {name}."
+    },
+    "Projects": {
+        "back": "Zurück",
+        "showDetails": "Details anzeigen",
+        "showReadme": "README anzeigen",
+        "noDescription": "Keine Beschreibung auf GitHub hinterlegt.",
+        "languages": "Sprachen",
+        "updated": "Aktualisiert",
+        "topics": "Themen",
+        "noTopics": "Keine Themen",
+        "viewRepository": "Repository öffnen",
+        "unknown": "Unbekannt"
+    },
+    "ContentRenderer": {
+        "rendered": "Gerendert",
+        "raw": "Roh"
     }
 }
