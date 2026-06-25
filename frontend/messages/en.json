@@ -36,5 +36,17 @@
     "ContentRenderer": {
         "rendered": "Rendered",
         "raw": "Raw"
+    },
+    "Setup": {
+        "selection": "Selection",
+        "docs": "Docs",
+        "files": "Files",
+        "selectedFile": "Selected file",
+        "selectedFolder": "Selected folder",
+        "selectFile": "Select a file to view it.",
+        "selectFileFromFolder": "Select a file from this folder.",
+        "back": "Back to setup",
+        "copy": "Copy",
+        "copied": "Copied"
     }
 }

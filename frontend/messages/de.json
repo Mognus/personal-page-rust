@@ -36,5 +36,17 @@
     "ContentRenderer": {
         "rendered": "Gerendert",
         "raw": "Roh"
+    },
+    "Setup": {
+        "selection": "Auswahl",
+        "docs": "Doku",
+        "files": "Dateien",
+        "selectedFile": "Ausgewählte Datei",
+        "selectedFolder": "Ausgewählter Ordner",
+        "selectFile": "Wähle eine Datei zum Ansehen.",
+        "selectFileFromFolder": "Wähle eine Datei aus diesem Ordner.",
+        "back": "Zurück zum Setup",
+        "copy": "Kopieren",
+        "copied": "Kopiert"
     }
 }
