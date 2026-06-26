@@ -5,6 +5,6 @@
     { "slug": "neovim", "label": "Neovim", "icon": "Code2", "path": ".config/nvim", "position": 3 },
     { "slug": "shell", "label": "Shell", "icon": "Terminal", "path": ".config/fish", "position": 4 },
     { "slug": "notifications", "label": "Notifications", "icon": "Bell", "path": ".config/dunst", "position": 5 },
-    { "slug": "eww", "label": "EWW", "icon": "Layers", "path": ".config/eww", "position": 6 },
+    { "slug": "quickshell", "label": "Quickshell", "icon": "Layers", "path": ".config/quickshell", "position": 6 },
     { "slug": "tools", "label": "Tools", "icon": "Package", "path": ".config/tools", "position": 7 }
 ]
