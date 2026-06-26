@@ -1,10 +1,9 @@
 [
     { "slug": "hyprland", "label": "Hyprland", "icon": "Monitor", "path": ".config/hypr", "position": 0 },
-    { "slug": "waybar", "label": "Waybar", "icon": "PanelTop", "path": ".config/waybar", "position": 1 },
-    { "slug": "kitty", "label": "Kitty", "icon": "SquareTerminal", "path": ".config/kitty", "position": 2 },
-    { "slug": "neovim", "label": "Neovim", "icon": "Code2", "path": ".config/nvim", "position": 3 },
-    { "slug": "shell", "label": "Shell", "icon": "Terminal", "path": ".config/fish", "position": 4 },
-    { "slug": "notifications", "label": "Notifications", "icon": "Bell", "path": ".config/dunst", "position": 5 },
-    { "slug": "quickshell", "label": "Quickshell", "icon": "Layers", "path": ".config/quickshell", "position": 6 },
-    { "slug": "tools", "label": "Tools", "icon": "Package", "path": ".config/tools", "position": 7 }
+    { "slug": "kitty", "label": "Kitty", "icon": "SquareTerminal", "path": ".config/kitty", "position": 1 },
+    { "slug": "neovim", "label": "Neovim", "icon": "Code2", "path": ".config/nvim", "position": 2 },
+    { "slug": "shell", "label": "Shell", "icon": "Terminal", "path": ".config/fish", "position": 3 },
+    { "slug": "notifications", "label": "Notifications", "icon": "Bell", "path": ".config/dunst", "position": 4 },
+    { "slug": "quickshell", "label": "Quickshell", "icon": "Layers", "path": ".config/quickshell", "position": 5 },
+    { "slug": "tools", "label": "Tools", "icon": "Package", "path": ".config/tools", "position": 6 }
 ]
