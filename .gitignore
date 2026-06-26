@@ -2,3 +2,6 @@
 
 # Real seed data lives off-repo (server / local), only *.json.example is tracked.
 backend/seeds/*.json
+
+# Private docs served only via the auth-gated route handler.
+frontend/private/

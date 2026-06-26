@@ -1,5 +1,9 @@
-import CubeScene from "@/features/cube/components/cube-scene";
+import CubeScene from "@/features/home/components/cube-scene";
 
 export default function Home() {
-    return <CubeScene />;
+    return (
+        <div className="absolute inset-0">
+            <CubeScene />
+        </div>
+    );
 }
