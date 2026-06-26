@@ -1,5 +1,6 @@
 {
     "Nav": {
+        "home": "Start",
         "projects": "Projekte",
         "personalSetup": "Persönliches Setup"
     },

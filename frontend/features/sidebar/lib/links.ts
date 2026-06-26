@@ -3,9 +3,12 @@
 export type NavLink = {
     href: string;
     labelKey: string;
+    // Nested under a parent entry (e.g. Home) — rendered slightly indented.
+    indent?: boolean;
 };
 
 export const links: NavLink[] = [
-    { href: "/projects", labelKey: "projects" },
-    { href: "/personal-setup", labelKey: "personalSetup" },
+    { href: "/", labelKey: "home" },
+    { href: "/projects", labelKey: "projects", indent: true },
+    { href: "/personal-setup", labelKey: "personalSetup", indent: true },
 ];

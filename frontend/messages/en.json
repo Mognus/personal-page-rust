@@ -1,5 +1,6 @@
 {
     "Nav": {
+        "home": "Home",
         "projects": "Projects",
         "personalSetup": "Personal Setup"
     },

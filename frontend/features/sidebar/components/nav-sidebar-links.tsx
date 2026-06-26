@@ -26,7 +26,10 @@ export function NavSidebarLinks({ items, className }: NavSidebarLinksProps) {
                     // and on the active link (peer-data-[active]) — no custom CSS.
                     <div
                         key={item.href}
-                        className="group flex min-w-0 flex-col gap-1"
+                        className={cn(
+                            "group flex min-w-0 flex-col gap-1",
+                            item.indent && "ml-1",
+                        )}
                     >
                         <Link
                             href={item.href}
