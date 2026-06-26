@@ -1,31 +1,37 @@
 use std::{env, fs};
 
+use serde::Deserialize;
 use sqlx::PgPool;
 
 const DEFAULT_DATABASE_URL: &str = "postgres://personal_page:personal_page@localhost:5432/personal_page";
+const DEFAULT_SEED_FILE: &str = "seeds/configs.json";
 
-// (slug, label, icon, path, position). icon = lucide name resolved client-side.
-// NOTE: keep this in sync with the actual dotfiles — e.g. Kitty replaced
-// Alacritty. Adjust paths/entries here when the setup changes.
-const SEED_CONFIGS: &[(&str, &str, &str, &str, i32)] = &[
-    ("hyprland", "Hyprland", "Monitor", ".config/hypr", 0),
-    ("waybar", "Waybar", "PanelTop", ".config/waybar", 1),
-    ("kitty", "Kitty", "SquareTerminal", ".config/kitty", 2),
-    ("neovim", "Neovim", "Code2", ".config/nvim", 3),
-    ("shell", "Shell", "Terminal", ".config/fish", 4),
-    ("notifications", "Notifications", "Bell", ".config/dunst", 5),
-    ("eww", "EWW", "Layers", ".config/eww", 6),
-    ("tools", "Tools", "Package", ".config/tools", 7),
-];
+// One config entry from the seed file (see seeds/configs.json.example). The data
+// lives off-repo; pass --file <path> (prod mounts it into the container). icon
+// is a lucide name resolved client-side.
+#[derive(Debug, Deserialize)]
+struct SeedConfig {
+    slug: String,
+    label: String,
+    icon: String,
+    path: String,
+    #[serde(default)]
+    position: i32,
+}
 
 #[tokio::main]
 async fn main() {
-    let database_url = database_url();
-    let db = PgPool::connect(&database_url)
+    let path = seed_file_path();
+    let content = fs::read_to_string(&path)
+        .unwrap_or_else(|error| panic!("could not read seed file '{path}': {error}"));
+    let configs: Vec<SeedConfig> = serde_json::from_str(&content)
+        .unwrap_or_else(|error| panic!("invalid JSON in '{path}': {error}"));
+
+    let db = PgPool::connect(&database_url())
         .await
         .expect("failed to connect to database");
 
-    for (slug, label, icon, path, position) in SEED_CONFIGS {
+    for config in &configs {
         sqlx::query(
             r#"
             INSERT INTO configs (slug, label, icon, path, position)
@@ -39,17 +45,30 @@ async fn main() {
                 updated_at = now()
             "#,
         )
-        .bind(slug)
-        .bind(label)
-        .bind(icon)
-        .bind(path)
-        .bind(position)
+        .bind(&config.slug)
+        .bind(&config.label)
+        .bind(&config.icon)
+        .bind(&config.path)
+        .bind(config.position)
         .execute(&db)
         .await
         .expect("failed to seed config");
 
-        println!("seeded {slug} -> {path}");
+        println!("seeded {} -> {}", config.slug, config.path);
     }
+}
+
+// Path to the seed file: --file <path>, else the default relative to the cwd.
+fn seed_file_path() -> String {
+    let args: Vec<String> = env::args().skip(1).collect();
+    flag(&args, "--file").unwrap_or_else(|| DEFAULT_SEED_FILE.to_string())
+}
+
+fn flag(args: &[String], name: &str) -> Option<String> {
+    args.iter()
+        .position(|arg| arg == name)
+        .and_then(|index| args.get(index + 1))
+        .cloned()
 }
 
 fn database_url() -> String {

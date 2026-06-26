@@ -1,0 +1,10 @@
+[
+    { "slug": "hyprland", "label": "Hyprland", "icon": "Monitor", "path": ".config/hypr", "position": 0 },
+    { "slug": "waybar", "label": "Waybar", "icon": "PanelTop", "path": ".config/waybar", "position": 1 },
+    { "slug": "kitty", "label": "Kitty", "icon": "SquareTerminal", "path": ".config/kitty", "position": 2 },
+    { "slug": "neovim", "label": "Neovim", "icon": "Code2", "path": ".config/nvim", "position": 3 },
+    { "slug": "shell", "label": "Shell", "icon": "Terminal", "path": ".config/fish", "position": 4 },
+    { "slug": "notifications", "label": "Notifications", "icon": "Bell", "path": ".config/dunst", "position": 5 },
+    { "slug": "eww", "label": "EWW", "icon": "Layers", "path": ".config/eww", "position": 6 },
+    { "slug": "tools", "label": "Tools", "icon": "Package", "path": ".config/tools", "position": 7 }
+]

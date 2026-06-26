@@ -1,25 +1,35 @@
 use std::{env, fs};
 
+use serde::Deserialize;
 use sqlx::PgPool;
 
 const DEFAULT_DATABASE_URL: &str = "postgres://personal_page:personal_page@localhost:5432/personal_page";
+const DEFAULT_SEED_FILE: &str = "seeds/projects.json";
 
-// (slug, full_name, label, position). The enso angle is derived from position
-// in the frontend, so we only seed the order here, not a literal angle.
-const SEED_PROJECTS: &[(&str, &str, &str, i32)] = &[
-    ("dotfiles", "Mognus/linux-dotfiles", "Dotfiles", 0),
-    ("personal-blog", "Mognus/personal-blog", "Personal Blog", 1),
-    ("auth-service", "Mognus/auth-service", "Auth Service", 2),
-];
+// One project entry from the seed file (see seeds/projects.json.example). The
+// data lives off-repo; pass --file <path> (prod mounts it into the container).
+#[derive(Debug, Deserialize)]
+struct SeedProject {
+    slug: String,
+    full_name: String,
+    label: String,
+    #[serde(default)]
+    position: i32,
+}
 
 #[tokio::main]
 async fn main() {
-    let database_url = database_url();
-    let db = PgPool::connect(&database_url)
+    let path = seed_file_path();
+    let content = fs::read_to_string(&path)
+        .unwrap_or_else(|error| panic!("could not read seed file '{path}': {error}"));
+    let projects: Vec<SeedProject> = serde_json::from_str(&content)
+        .unwrap_or_else(|error| panic!("invalid JSON in '{path}': {error}"));
+
+    let db = PgPool::connect(&database_url())
         .await
         .expect("failed to connect to database");
 
-    for (slug, full_name, label, position) in SEED_PROJECTS {
+    for project in &projects {
         sqlx::query(
             r#"
             INSERT INTO projects (slug, full_name, label, position)
@@ -32,16 +42,29 @@ async fn main() {
                 updated_at = now()
             "#,
         )
-        .bind(slug)
-        .bind(full_name)
-        .bind(label)
-        .bind(position)
+        .bind(&project.slug)
+        .bind(&project.full_name)
+        .bind(&project.label)
+        .bind(project.position)
         .execute(&db)
         .await
         .expect("failed to seed project");
 
-        println!("seeded {slug} -> {full_name}");
+        println!("seeded {} -> {}", project.slug, project.full_name);
     }
+}
+
+// Path to the seed file: --file <path>, else the default relative to the cwd.
+fn seed_file_path() -> String {
+    let args: Vec<String> = env::args().skip(1).collect();
+    flag(&args, "--file").unwrap_or_else(|| DEFAULT_SEED_FILE.to_string())
+}
+
+fn flag(args: &[String], name: &str) -> Option<String> {
+    args.iter()
+        .position(|arg| arg == name)
+        .and_then(|index| args.get(index + 1))
+        .cloned()
 }
 
 fn database_url() -> String {

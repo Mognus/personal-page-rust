@@ -1,1 +1,4 @@
 .env
+
+# Real seed data lives off-repo (server / local), only *.json.example is tracked.
+backend/seeds/*.json
