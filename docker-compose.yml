@@ -13,7 +13,8 @@ services:
       timeout: 5s
       retries: 5
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      # postgres:18 image layout — mount the parent (matches the dev compose).
+      - postgres_data:/var/lib/postgresql
     restart: always
 
   migrate:
