@@ -1,9 +1,10 @@
 use std::{env, fs};
 
 use serde::Deserialize;
-use sqlx::PgPool;
 
-const DEFAULT_DATABASE_URL: &str = "postgres://personal_page:personal_page@localhost:5432/personal_page";
+#[path = "../seed_support.rs"]
+mod seed_support;
+
 const DEFAULT_SEED_FILE: &str = "seeds/configs.json";
 
 // One config entry from the seed file (see seeds/configs.json.example). The data
@@ -19,17 +20,21 @@ struct SeedConfig {
     position: i32,
 }
 
+// Usage: seed_configs [--file <path>] [--clean [--yes]]
+//   --clean  delete configs whose slug is no longer in the seed file
+//   --yes    skip the confirmation prompt (for non-interactive runs)
 #[tokio::main]
 async fn main() {
-    let path = seed_file_path();
+    let args: Vec<String> = env::args().skip(1).collect();
+    let path =
+        seed_support::flag(&args, "--file").unwrap_or_else(|| DEFAULT_SEED_FILE.to_string());
+
     let content = fs::read_to_string(&path)
         .unwrap_or_else(|error| panic!("could not read seed file '{path}': {error}"));
     let configs: Vec<SeedConfig> = serde_json::from_str(&content)
         .unwrap_or_else(|error| panic!("invalid JSON in '{path}': {error}"));
 
-    let db = PgPool::connect(&database_url())
-        .await
-        .expect("failed to connect to database");
+    let db = seed_support::connect().await;
 
     for config in &configs {
         sqlx::query(
@@ -56,35 +61,12 @@ async fn main() {
 
         println!("seeded {} -> {}", config.slug, config.path);
     }
-}
 
-// Path to the seed file: --file <path>, else the default relative to the cwd.
-fn seed_file_path() -> String {
-    let args: Vec<String> = env::args().skip(1).collect();
-    flag(&args, "--file").unwrap_or_else(|| DEFAULT_SEED_FILE.to_string())
-}
-
-fn flag(args: &[String], name: &str) -> Option<String> {
-    args.iter()
-        .position(|arg| arg == name)
-        .and_then(|index| args.get(index + 1))
-        .cloned()
-}
-
-fn database_url() -> String {
-    env::var("DATABASE_URL")
-        .ok()
-        .or_else(|| database_url_from_env_file(".env"))
-        .or_else(|| database_url_from_env_file("../.env"))
-        .unwrap_or_else(|| DEFAULT_DATABASE_URL.to_string())
-}
-
-fn database_url_from_env_file(path: &str) -> Option<String> {
-    let content = fs::read_to_string(path).ok()?;
-
-    content.lines().find_map(|line| {
-        let (key, value) = line.split_once('=')?;
-
-        (key == "DATABASE_URL").then(|| value.trim().to_string())
-    })
+    // --clean: prune configs the seed no longer lists (e.g. a removed dotfile).
+    if seed_support::has_flag(&args, "--clean") {
+        let keep: Vec<String> = configs.iter().map(|config| config.slug.clone()).collect();
+        seed_support::clean_stale(&db, "configs", "slug", &keep, seed_support::has_flag(&args, "--yes"))
+            .await
+            .expect("failed to clean configs");
+    }
 }

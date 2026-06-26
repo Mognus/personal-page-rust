@@ -1,4 +1,4 @@
-use std::{env, fs};
+use std::env;
 
 use argon2::{
     Argon2, PasswordHasher,
@@ -7,7 +7,9 @@ use argon2::{
 use rand_core::OsRng;
 use sqlx::PgPool;
 
-const DEFAULT_DATABASE_URL: &str = "postgres://personal_page:personal_page@localhost:5432/personal_page";
+#[path = "../seed_support.rs"]
+mod seed_support;
+
 const SEED_PASSWORD: &str = "secret-password";
 const SEED_USERS: &[(&str, &str, &str)] = &[
     ("admin@example.com", "Admin", "admin"),
@@ -18,9 +20,7 @@ const ROLES: &[&str] = &["user", "friend", "admin"];
 
 #[tokio::main]
 async fn main() {
-    let db = PgPool::connect(&database_url())
-        .await
-        .expect("failed to connect to database");
+    let db = seed_support::connect().await;
 
     // With --email/--password: create one user with a custom password (use this
     // in prod). Without args: seed the default dev batch.
@@ -48,11 +48,11 @@ struct NewUser {
 fn parse_custom_user() -> Option<NewUser> {
     let args: Vec<String> = env::args().skip(1).collect();
 
-    let email = flag(&args, "--email")?;
-    let password = flag(&args, "--password")?;
-    let display_name = flag(&args, "--name")
+    let email = seed_support::flag(&args, "--email")?;
+    let password = seed_support::flag(&args, "--password")?;
+    let display_name = seed_support::flag(&args, "--name")
         .unwrap_or_else(|| email.split('@').next().unwrap_or(&email).to_string());
-    let role = flag(&args, "--role").unwrap_or_else(|| "admin".to_string());
+    let role = seed_support::flag(&args, "--role").unwrap_or_else(|| "admin".to_string());
 
     if !ROLES.contains(&role.as_str()) {
         eprintln!("invalid role '{role}' (use: {})", ROLES.join(" | "));
@@ -65,13 +65,6 @@ fn parse_custom_user() -> Option<NewUser> {
         password,
         role,
     })
-}
-
-fn flag(args: &[String], name: &str) -> Option<String> {
-    args.iter()
-        .position(|arg| arg == name)
-        .and_then(|index| args.get(index + 1))
-        .cloned()
 }
 
 async fn upsert_user(db: &PgPool, email: &str, display_name: &str, password: &str, role: &str) {
@@ -98,24 +91,6 @@ async fn upsert_user(db: &PgPool, email: &str, display_name: &str, password: &st
     .expect("failed to seed user");
 
     println!("seeded {email} as {role}");
-}
-
-fn database_url() -> String {
-    env::var("DATABASE_URL")
-        .ok()
-        .or_else(|| database_url_from_env_file(".env"))
-        .or_else(|| database_url_from_env_file("../.env"))
-        .unwrap_or_else(|| DEFAULT_DATABASE_URL.to_string())
-}
-
-fn database_url_from_env_file(path: &str) -> Option<String> {
-    let content = fs::read_to_string(path).ok()?;
-
-    content.lines().find_map(|line| {
-        let (key, value) = line.split_once('=')?;
-
-        (key == "DATABASE_URL").then(|| value.trim().to_string())
-    })
 }
 
 fn hash_password(password: &str) -> Result<String, argon2::password_hash::Error> {
