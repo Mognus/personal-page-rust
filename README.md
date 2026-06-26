@@ -36,6 +36,14 @@ cargo run --bin seed_configs      # reads seeds/configs.json
 cargo run --bin seed_projects     # reads seeds/projects.json
 ```
 
+Re-running a seeder **upserts** (updates by slug, never deletes). To also remove
+rows no longer in the seed file — e.g. a dropped config — add `--clean`; it lists
+what it would delete and asks first (`seed_users` has no `--clean`):
+
+```bash
+cargo run --bin seed_configs -- --clean
+```
+
 Then open `http://localhost:3000` and sign in at `/login` with
 `admin@example.com` / `secret-password`.
 
@@ -57,6 +65,13 @@ Seed once after the first deploy:
 docker exec personal-page-backend seed_users --email you@example.com --password 'secret' --role admin
 docker exec personal-page-backend seed_configs  --file /seeds/configs.json
 docker exec personal-page-backend seed_projects --file /seeds/projects.json
+```
+
+`--clean` works here too, but `docker exec` has no TTY for the prompt — pair it
+with `--yes` to confirm non-interactively:
+
+```bash
+docker exec personal-page-backend seed_configs --file /seeds/configs.json --clean --yes
 ```
 
 Private documents (CV / references) are served off-repo too — they are
