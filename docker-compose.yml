@@ -66,6 +66,14 @@ services:
       # GitHub access for the projects + personal-setup views (server-side only).
       GITHUB_DOTFILES_REPO: ${GITHUB_DOTFILES_REPO}
       GITHUB_TOKEN: ${GITHUB_TOKEN}
+      # Where the auth-gated /api/docs route reads PDFs from (the mount below).
+      DOCS_DIR: /docs
+    volumes:
+      # Off-repo private PDFs for the /api/docs route, read-only. Point DOCS_DIR
+      # at the server folder holding them (e.g. magnus-lebenslauf.pdf); they are
+      # gitignored and never enter the repo or image. Defaults to the local
+      # ./frontend/private for a plain `docker compose -f docker-compose.yml` run.
+      - ${DOCS_DIR:-./frontend/private}:/docs:ro
     ports:
       # Only the frontend is published; nginx proxies the domain to it.
       - "3000:3000"

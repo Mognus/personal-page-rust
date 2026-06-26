@@ -59,6 +59,14 @@ docker exec personal-page-backend seed_configs  --file /seeds/configs.json
 docker exec personal-page-backend seed_projects --file /seeds/projects.json
 ```
 
+Private documents (CV / references) are served off-repo too — they are
+gitignored and never deployed by CI. Put the PDFs in `DOCS_DIR` on the server
+(mounted read-only at `/docs`), e.g. with rsync from your machine:
+
+```bash
+rsync -avz frontend/private/ you@server:~/personal-page-docs/
+```
+
 DB backups are written before every deploy to `~/backups/db-<timestamp>.sql.gz`
 (last 7 kept).
 
@@ -66,6 +74,7 @@ DB backups are written before every deploy to `~/backups/db-<timestamp>.sql.gz`
 
 | Where | What |
 |-------|------|
-| `.env` / `~/personal-page.env` | DB, JWT, `BACKEND_URL`, `GITHUB_*`, `SEEDS_DIR` — see `.env.example` |
+| `.env` / `~/personal-page.env` | DB, JWT, `BACKEND_URL`, `GITHUB_*`, `SEEDS_DIR`, `DOCS_DIR` — see `.env.example` |
 | `backend/seeds/*.json` | seed content (gitignored; `*.example` tracked) |
+| `frontend/private/*.pdf` | private docs for `/api/docs` (gitignored; mounted via `DOCS_DIR`) |
 | `nginx.conf.example` | reverse proxy (`/` → `:3000`) |
