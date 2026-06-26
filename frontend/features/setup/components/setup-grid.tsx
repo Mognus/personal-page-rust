@@ -55,7 +55,9 @@ export function SetupGrid({ configs, children }: SetupGridProps) {
                     ) : (
                         <FloatWrapper
                             float={float(5 + index * 0.15, index * -0.2, 3, -4)}
-                            className="h-full min-h-0"
+                            // p-2 buffer so the floating corners never reach the
+                            // cell's overflow-hidden edge and get clipped.
+                            className="h-full min-h-0 p-2"
                             innerClassName="h-full min-h-0"
                         >
                             <ConfigButton

@@ -12,6 +12,7 @@ import {
     type LucideIcon,
 } from "lucide-react";
 
+import { CornerFrame } from "@/components/corner-frame";
 import { Text } from "@/components/typography/text";
 import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
@@ -49,20 +50,25 @@ export function ConfigButton({
     const Icon = ICON_MAP[icon] ?? Package;
 
     return (
-        <Link
-            href={`/personal-setup/${slug}`}
-            className={cn(
-                "flex h-full w-full flex-col items-center justify-center gap-3 border border-foreground/20 p-4 transition-colors hover:border-foreground/60",
-                className,
-            )}
-        >
-            <Icon
-                className={cn("size-7 shrink-0", iconClassName)}
-                strokeWidth={1.5}
-            />
-            <Text as="span" variant="eyebrow" className={cn("font-mono", textClassName)}>
-                {label}
-            </Text>
+        <Link href={`/personal-setup/${slug}`} className="block h-full w-full">
+            <CornerFrame
+                className={cn(
+                    "flex h-full w-full flex-col items-center justify-center gap-3 bg-foreground/5 p-4 transition-colors hover:bg-foreground/10",
+                    className,
+                )}
+            >
+                <Icon
+                    className={cn("size-7 shrink-0", iconClassName)}
+                    strokeWidth={1.5}
+                />
+                <Text
+                    as="span"
+                    variant="eyebrow"
+                    className={cn("font-mono", textClassName)}
+                >
+                    {label}
+                </Text>
+            </CornerFrame>
         </Link>
     );
 }

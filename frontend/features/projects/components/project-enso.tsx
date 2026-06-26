@@ -3,6 +3,7 @@
 import type { ReactNode } from "react";
 import { useParams } from "next/navigation";
 
+import { CornerFrame } from "@/components/corner-frame";
 import { Text } from "@/components/typography/text";
 import type { ProjectOrbit } from "@/features/projects/lib/projects";
 import { Link } from "@/i18n/navigation";
@@ -86,17 +87,19 @@ function ProjectOrbitItem({
         >
             <div className={cn("counter-spin", spinPaused && "spin-paused")}>
                 {active ? (
-                    <div className="grid gap-4 border border-foreground/30 bg-background p-4 transition-[width,height] duration-300 ease-out">
+                    <CornerFrame className="grid gap-4 bg-background p-4 transition-[width,height] duration-300 ease-out">
                         {children}
-                    </div>
+                    </CornerFrame>
                 ) : (
                     <Link
-                        className="flex aspect-[3/1] w-[clamp(7rem,18vw,14rem)] items-center justify-center border border-foreground/30 bg-background px-4 text-center hover:border-foreground/70"
+                        className="block aspect-[3/1] w-[clamp(7rem,18vw,14rem)]"
                         href={project.href}
                     >
-                        <Text as="span" variant="eyebrow">
-                            {project.label}
-                        </Text>
+                        <CornerFrame className="flex h-full w-full items-center justify-center bg-background px-4 text-center transition-colors hover:bg-muted">
+                            <Text as="span" variant="eyebrow">
+                                {project.label}
+                            </Text>
+                        </CornerFrame>
                     </Link>
                 )}
             </div>
