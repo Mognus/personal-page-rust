@@ -8,6 +8,7 @@ import { authApi } from "@/features/auth/lib/auth-api";
 const DOCS: Record<string, string> = {
     cv: "magnus-lebenslauf.pdf",
     zeugnisse: "magnus-zeugnisse.pdf",
+    abilities: "magnus-abilities.pdf",
 };
 
 // Docs live outside public/. In prod, mount the folder and set DOCS_DIR.

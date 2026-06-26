@@ -2,7 +2,13 @@
 
 import { Html, useTexture } from "@react-three/drei";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { FileText, GraduationCap, LogIn, type LucideIcon } from "lucide-react";
+import {
+    FileText,
+    GraduationCap,
+    LogIn,
+    Sparkles,
+    type LucideIcon,
+} from "lucide-react";
 import { Suspense, useRef, useState } from "react";
 import type { Group, Mesh } from "three";
 
@@ -13,7 +19,7 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 
 // A cube face that carries a link. `targetY` is the cube's Y-rotation that
 // brings this face to the front (camera looks straight down -Z):
-//   +Z face → 0,   +X face → -90°.
+//   +Z face → 0,   +X face → -90°,   -X face → +90°.
 // `buttonIcon` / `faceIcon` are optional; omit them and nothing is rendered.
 type CubeFace = {
     key: string;
@@ -51,6 +57,17 @@ const DOC_FACES: CubeFace[] = [
         rotation: [0, Math.PI / 2, 0],
         buttonIcon: GraduationCap,
         faceIcon: GraduationCap,
+    },
+    {
+        key: "abilities",
+        label: "Fähigkeiten",
+        href: "/api/docs/abilities",
+        newTab: true,
+        targetY: Math.PI / 2,
+        position: [-1.01, 0, 0],
+        rotation: [0, -Math.PI / 2, 0],
+        buttonIcon: Sparkles,
+        faceIcon: Sparkles,
     },
 ];
 
