@@ -14,6 +14,19 @@ interface MutableFileTreeNode extends Omit<FileTreeNode, "children"> {
     childMap: Map<string, MutableFileTreeNode>;
 }
 
+// Splits a config's entries into documentation (.md) and the remaining files.
+export function splitConfigFiles(files: GithubEntry[]) {
+    const fileEntries = files.filter((file) => file.type === "file");
+    const markdownFiles = fileEntries.filter((file) =>
+        file.name.toLowerCase().endsWith(".md"),
+    );
+    const configFiles = fileEntries.filter(
+        (file) => !file.name.toLowerCase().endsWith(".md"),
+    );
+
+    return { markdownFiles, configFiles };
+}
+
 // Strips the config's folder prefix so paths read relative to the config root.
 export function getRelativePath(configPath: string, filePath: string) {
     const prefix = configPath.endsWith("/") ? configPath : `${configPath}/`;
