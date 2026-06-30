@@ -44,14 +44,14 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
                             staticBorder
                         />
                     </div>
-                    <div className="fixed top-7/12 left-[5vw] z-50 flex -translate-y-1/2 flex-col">
+                    {/* Top-anchored so the gear hangs under the last nav item
+                        and the settings panel drops down below it. */}
+                    <div className="fixed top-1/2 left-[5vw] z-50 flex flex-col gap-6">
                         <NavSidebarLinks items={links} />
-                    </div>
-                    {/* User pinned near the bottom (above the toggle). The group is
-                        bottom-anchored, so the panel opens upward above the user. */}
-                    <div className="fixed bottom-18 left-[5vw] z-50 flex flex-col">
-                        <SettingsPanel className="mb-4 border-l border-foreground/40 pl-3" />
-                        <SidebarUser />
+                        <div className="flex flex-col gap-3">
+                            <SidebarUser align="start" />
+                            <SettingsPanel className="border-l border-foreground/40 pl-3" />
+                        </div>
                     </div>
                     <div className="fixed top-2/3 right-[5vw] z-50 -translate-y-1/2">
                         <SocialBar
