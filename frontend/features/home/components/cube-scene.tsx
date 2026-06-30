@@ -24,6 +24,9 @@ import { useMediaQuery } from "@/hooks/use-media-query";
 type CubeFace = {
     key: string;
     label: string;
+    // Short label for the bottom button; falls back to `label`. Used when the
+    // face label is a full sentence (the login CTA) that would overflow.
+    buttonLabel?: string;
     href: string;
     newTab: boolean;
     targetY: number;
@@ -76,6 +79,7 @@ const GUEST_FACES: CubeFace[] = [
     {
         key: "login",
         label: "Für mehr Zugriff – z.B. Zeugnis & Lebenslauf – einloggen",
+        buttonLabel: "Einloggen",
         href: "/login",
         newTab: false,
         targetY: 0,
@@ -142,9 +146,10 @@ function Cube({
                         occlude={[meshRef]}
                         // Sharpness trick: the inner element is sized at 4x and
                         // scaled back down here, so the text rasterizes crisp
-                        // instead of being upscaled (blurry). Visual size ≈ 0.4;
-                        // if you change it, keep the 4x inner dimensions in sync.
-                        scale={0.2}
+                        // instead of being upscaled (blurry). Lowering this only
+                        // shrinks the face (stays crisp); keep the 4x inner
+                        // dimensions if you enlarge it again.
+                        scale={0.17}
                     >
                         <button
                             type="button"
@@ -187,7 +192,7 @@ export default function CubeScene() {
                 </Suspense>
             </Canvas>
 
-            <div className="absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+            <div className="absolute bottom-6 left-1/2 z-10 flex max-w-[calc(100vw-2rem)] -translate-x-1/2 flex-wrap justify-center gap-2">
                 {faces.map((face) => {
                     const ButtonIcon = face.buttonIcon;
                     return (
@@ -200,7 +205,7 @@ export default function CubeScene() {
                             onClick={() => toggleFace(face.targetY)}
                         >
                             {ButtonIcon && <ButtonIcon />}
-                            {face.label}
+                            {face.buttonLabel ?? face.label}
                         </Button>
                     );
                 })}
