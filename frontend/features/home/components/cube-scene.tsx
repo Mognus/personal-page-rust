@@ -144,6 +144,10 @@ function Cube({
                         transform
                         center
                         occlude={[meshRef]}
+                        // Keep the face DOM below the sidebar overlay (z-40);
+                        // drei defaults to a huge z-index, so it would otherwise
+                        // sit on top, stay clickable, and shine through.
+                        zIndexRange={[30, 0]}
                         // Sharpness trick: the inner element is sized at 4x and
                         // scaled back down here, so the text rasterizes crisp
                         // instead of being upscaled (blurry). Lowering this only
@@ -154,7 +158,11 @@ function Cube({
                         <button
                             type="button"
                             onClick={() => activate(face)}
-                            className="flex w-[720px] cursor-pointer flex-col items-center justify-center gap-6 px-12 py-12 text-center text-5xl font-medium tracking-wide whitespace-normal text-foreground/85 uppercase transition-colors hover:text-foreground"
+                            // The face sits on the (constant) profile photo, so
+                            // the text must not follow the theme colour. Fixed
+                            // light text + a soft shadow stays readable over both
+                            // the bright and dark areas of the photo, in either mode.
+                            className="flex w-[720px] cursor-pointer flex-col items-center justify-center gap-6 px-12 py-12 text-center text-4xl font-medium tracking-wide whitespace-normal text-white/90 uppercase drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] transition-colors hover:text-white"
                         >
                             {FaceIcon && <FaceIcon className="size-24" />}
                             <span className="leading-tight">{face.label}</span>
