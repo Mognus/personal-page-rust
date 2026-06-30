@@ -14,17 +14,29 @@ interface MutableFileTreeNode extends Omit<FileTreeNode, "children"> {
     childMap: Map<string, MutableFileTreeNode>;
 }
 
-// Splits a config's entries into documentation (.md) and the remaining files.
+const IMAGE_EXTENSIONS = [".png", ".jpg", ".jpeg", ".gif", ".webp", ".svg"];
+
+function isMarkdown(name: string) {
+    return name.toLowerCase().endsWith(".md");
+}
+
+function isImage(name: string) {
+    const lower = name.toLowerCase();
+    return IMAGE_EXTENSIONS.some((ext) => lower.endsWith(ext));
+}
+
+// Splits a config's entries into documentation (.md), images, and the remaining
+// config files. Images are peeled off so they never land in the (text-only)
+// file view, where their binary content would render as garbage.
 export function splitConfigFiles(files: GithubEntry[]) {
     const fileEntries = files.filter((file) => file.type === "file");
-    const markdownFiles = fileEntries.filter((file) =>
-        file.name.toLowerCase().endsWith(".md"),
-    );
+    const markdownFiles = fileEntries.filter((file) => isMarkdown(file.name));
+    const imageFiles = fileEntries.filter((file) => isImage(file.name));
     const configFiles = fileEntries.filter(
-        (file) => !file.name.toLowerCase().endsWith(".md"),
+        (file) => !isMarkdown(file.name) && !isImage(file.name),
     );
 
-    return { markdownFiles, configFiles };
+    return { markdownFiles, imageFiles, configFiles };
 }
 
 // Strips the config's folder prefix so paths read relative to the config root.

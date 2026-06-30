@@ -1,12 +1,13 @@
 "use client";
 
-import { FileText, FolderTree, X } from "lucide-react";
+import { FileText, FolderTree, Image as ImageIcon, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { Text } from "@/components/typography/text";
 import { Button } from "@/components/ui/button";
 import { FileTree } from "@/features/setup/components/file-list/file-tree";
+import { ImageSection } from "@/features/setup/components/file-list/image-section";
 import { MarkdownSection } from "@/features/setup/components/file-list/markdown-section";
 import { splitConfigFiles } from "@/features/setup/lib/file-tree";
 import type { GithubEntry } from "@/lib/github";
@@ -19,9 +20,11 @@ interface MobileFileSelectorProps {
     onToggle: () => void;
 }
 
+type Tab = "files" | "docs" | "images";
+
 // The selector that fills the bottom grid cell: a full-cell button when closed,
-// the file panel when open. The panel shows one section at a time (files or
-// docs); a floating top-right button swaps to the other and morphs into it.
+// the file panel when open. The panel shows one section at a time; floating
+// top-right buttons show the *other* available sections to jump to.
 export function MobileFileSelector({
     slug,
     configPath,
@@ -30,8 +33,26 @@ export function MobileFileSelector({
     onToggle,
 }: MobileFileSelectorProps) {
     const t = useTranslations("Setup");
-    const { markdownFiles, configFiles } = splitConfigFiles(files);
-    const [showingFiles, setShowingFiles] = useState(true);
+    const { markdownFiles, imageFiles, configFiles } = splitConfigFiles(files);
+    const [active, setActive] = useState<Tab>("files");
+
+    const tabMeta: Record<Tab, { icon: typeof FolderTree; label: string }> = {
+        files: { icon: FolderTree, label: t("files") },
+        docs: { icon: FileText, label: t("docs") },
+        images: { icon: ImageIcon, label: t("images") },
+    };
+
+    // Only sections that have content take part; the others are offered as
+    // jump targets in the floating switch.
+    const available: Tab[] = [
+        ...(configFiles.length ? (["files"] as const) : []),
+        ...(markdownFiles.length ? (["docs"] as const) : []),
+        ...(imageFiles.length ? (["images"] as const) : []),
+    ];
+    const current = available.includes(active)
+        ? active
+        : (available[0] ?? "files");
+    const others = available.filter((tab) => tab !== current);
 
     if (!open) {
         return (
@@ -51,31 +72,17 @@ export function MobileFileSelector({
     }
 
     return (
-        <div className="relative flex h-full min-h-0 flex-col overflow-hidden border-t border-foreground/40">
-            {/* Floating switch: shows the section you'd switch to. */}
-            <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowingFiles((value) => !value)}
-                className="absolute top-2 right-2 z-10 gap-1.5 rounded-none"
-            >
-                {showingFiles ? (
-                    <FileText className="size-4" />
-                ) : (
-                    <FolderTree className="size-4" />
-                )}
-                {showingFiles ? t("docs") : t("files")}
-            </Button>
-
+        <div className="flex h-full min-h-0 flex-col overflow-hidden border-t border-foreground/40">
             <div className="min-h-0 flex-1 overflow-y-auto p-4">
-                {showingFiles ? (
+                {current === "files" && (
                     <FileTree
                         as="div"
                         slug={slug}
                         configPath={configPath}
                         files={configFiles}
                     />
-                ) : (
+                )}
+                {current === "docs" && (
                     <MarkdownSection
                         as="div"
                         slug={slug}
@@ -83,9 +90,30 @@ export function MobileFileSelector({
                         files={markdownFiles}
                     />
                 )}
+                {current === "images" && (
+                    <ImageSection as="div" files={imageFiles} />
+                )}
             </div>
 
-            <div className="flex shrink-0 justify-end border-t border-foreground/40 p-2">
+            {/* Section switch bottom-left, close bottom-right. */}
+            <div className="flex shrink-0 items-center justify-between border-t border-foreground/40 p-2">
+                <div className="flex gap-2">
+                    {others.map((tab) => {
+                        const Icon = tabMeta[tab].icon;
+                        return (
+                            <Button
+                                key={tab}
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setActive(tab)}
+                                className="gap-1.5 rounded-none"
+                            >
+                                <Icon className="size-4" />
+                                {tabMeta[tab].label}
+                            </Button>
+                        );
+                    })}
+                </div>
                 <Button
                     variant="ghost"
                     size="icon"

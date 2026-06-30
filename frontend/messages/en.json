@@ -42,6 +42,7 @@
         "selection": "Selection",
         "docs": "Docs",
         "files": "Files",
+        "images": "Images",
         "selectedFile": "Selected file",
         "selectedFolder": "Selected folder",
         "selectFile": "Select a file to view it.",
