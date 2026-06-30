@@ -95,8 +95,8 @@ function ProjectOrbitItem({
                         className="block aspect-[3/1] w-[clamp(7rem,18vw,14rem)]"
                         href={project.href}
                     >
-                        <CornerFrame className="flex h-full w-full items-center justify-center bg-background px-4 text-center transition-colors hover:bg-muted">
-                            <Text as="span" variant="eyebrow">
+                        <CornerFrame className="flex h-full w-full items-center justify-center bg-background/65 p-4 text-center backdrop-blur-md transition-colors hover:bg-background/80">
+                            <Text as="span" variant="eyebrow" className="font-mono">
                                 {project.label}
                             </Text>
                         </CornerFrame>

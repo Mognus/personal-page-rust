@@ -53,7 +53,7 @@ export function ConfigButton({
         <Link href={`/personal-setup/${slug}`} className="block h-full w-full">
             <CornerFrame
                 className={cn(
-                    "flex h-full w-full flex-col items-center justify-center gap-3 bg-foreground/5 p-4 transition-colors hover:bg-foreground/10",
+                    "flex h-full w-full flex-col items-center justify-center gap-3 bg-background/65 p-4 backdrop-blur-md transition-colors hover:bg-background/80",
                     className,
                 )}
             >
