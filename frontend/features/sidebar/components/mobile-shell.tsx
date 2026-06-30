@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 
 import { SidebarUser } from "@/features/auth/components/sidebar-user";
-import { SettingsPanel } from "@/features/settings/components/settings-panel";
+import { SettingsPanelCompact } from "@/features/settings/components/settings-panel";
 import { Breadcrumbs } from "@/features/sidebar/components/breadcrumbs";
 import { NavSidebarLinks } from "@/features/sidebar/components/nav-sidebar-links";
 import { SidebarBrand } from "@/features/sidebar/components/sidebar-brand";
@@ -50,7 +50,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
                         <NavSidebarLinks items={links} />
                         <div className="flex flex-col gap-3">
                             <SidebarUser align="start" />
-                            <SettingsPanel className="border-l border-foreground/40 pl-3" />
+                            <SettingsPanelCompact className="border-l border-foreground/40 pl-3" />
                         </div>
                     </div>
                     <div className="fixed top-2/3 right-[5vw] z-50 -translate-y-1/2">

@@ -68,3 +68,19 @@ export function SettingsPanel({ className }: { className?: string }) {
         </div>
     );
 }
+
+// Label-free variant for tight spots (mobile): just the theme icon and the
+// language switch, which are self-explanatory. Shares the open/close state with
+// SettingsPanel above.
+export function SettingsPanelCompact({ className }: { className?: string }) {
+    const { isOpen } = useSettingsPanel();
+
+    if (!isOpen) return null;
+
+    return (
+        <div className={cn("flex flex-col items-start gap-3", className)}>
+            <ThemeToggle />
+            <LanguageSwitcher />
+        </div>
+    );
+}
