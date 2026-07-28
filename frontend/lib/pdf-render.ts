@@ -18,12 +18,17 @@ function cacheKey(doc: DocFile, suffix: string) {
     return `${doc.fileName}:${doc.mtimeMs}:${suffix}`;
 }
 
+// PDF.js rejects Node's Buffer subclass even though it extends Uint8Array.
+function pdfData(doc: DocFile): Uint8Array {
+    return new Uint8Array(doc.bytes);
+}
+
 export async function getPdfPageCount(doc: DocFile): Promise<number> {
     const key = cacheKey(doc, "count");
     const cached = pageCountCache.get(key);
     if (cached !== undefined) return cached;
 
-    const loadingTask = pdfjsLib.getDocument({ data: doc.bytes });
+    const loadingTask = pdfjsLib.getDocument({ data: pdfData(doc) });
     const pdf = await loadingTask.promise;
     const count = pdf.numPages;
     await loadingTask.destroy();
@@ -41,7 +46,7 @@ export async function renderPdfPage(
     const cached = pageCache.get(key);
     if (cached) return cached;
 
-    const loadingTask = pdfjsLib.getDocument({ data: doc.bytes });
+    const loadingTask = pdfjsLib.getDocument({ data: pdfData(doc) });
     const pdf = await loadingTask.promise;
     const page = await pdf.getPage(pageNumber);
     const viewport = page.getViewport({ scale });

@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/features/auth/store/user-store";
 import { BREAKPOINTS } from "@/features/sidebar/lib/breakpoints";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { cn } from "@/lib/utils";
 
 // A cube face that carries a link. `targetY` is the cube's Y-rotation that
 // brings this face to the front (camera looks straight down -Z):
@@ -29,6 +30,7 @@ type CubeFace = {
     buttonLabel?: string;
     href: string;
     newTab: boolean;
+    previewPage?: number;
     targetY: number;
     position: [number, number, number];
     rotation: [number, number, number];
@@ -44,6 +46,7 @@ const DOC_FACES: CubeFace[] = [
         label: "Lebenslauf",
         href: "/api/docs/cv",
         newTab: true,
+        previewPage: 1,
         targetY: 0,
         position: [0, 0, 1.01],
         rotation: [0, 0, 0],
@@ -55,6 +58,7 @@ const DOC_FACES: CubeFace[] = [
         label: "Zeugnis",
         href: "/api/docs/zeugnisse",
         newTab: true,
+        previewPage: 1,
         targetY: -Math.PI / 2,
         position: [1.01, 0, 0],
         rotation: [0, Math.PI / 2, 0],
@@ -66,6 +70,7 @@ const DOC_FACES: CubeFace[] = [
         label: "Fähigkeiten",
         href: "/api/docs/abilities",
         newTab: true,
+        previewPage: 1,
         targetY: Math.PI / 2,
         position: [-1.01, 0, 0],
         rotation: [0, -Math.PI / 2, 0],
@@ -136,6 +141,10 @@ function Cube({
             </mesh>
             {faces.map((face) => {
                 const FaceIcon = face.faceIcon;
+                const previewHref = face.previewPage
+                    ? `${face.href}?page=${face.previewPage}`
+                    : undefined;
+
                 return (
                     <Html
                         key={face.key}
@@ -153,19 +162,40 @@ function Cube({
                         // instead of being upscaled (blurry). Lowering this only
                         // shrinks the face (stays crisp); keep the 4x inner
                         // dimensions if you enlarge it again.
-                        scale={0.17}
+                        scale={previewHref ? 0.11 : 0.17}
                     >
                         <button
                             type="button"
                             onClick={() => activate(face)}
+                            style={
+                                previewHref
+                                    ? {
+                                          backgroundImage: `url("${previewHref}")`,
+                                      }
+                                    : undefined
+                            }
                             // The face sits on the (constant) profile photo, so
                             // the text must not follow the theme colour. Fixed
                             // light text + a soft shadow stays readable over both
                             // the bright and dark areas of the photo, in either mode.
-                            className="flex w-[720px] cursor-pointer flex-col items-center justify-center gap-6 px-12 py-12 text-center text-4xl font-medium tracking-wide whitespace-normal text-white/90 uppercase drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] transition-colors hover:text-white"
+                            className={cn(
+                                "flex w-[720px] cursor-pointer flex-col items-center justify-center gap-6 px-12 py-12 text-center text-4xl font-medium tracking-wide whitespace-normal text-white/90 uppercase drop-shadow-[0_2px_6px_rgba(0,0,0,0.6)] transition-colors hover:text-white",
+                                previewHref &&
+                                    "h-[720px] justify-end bg-white bg-contain bg-center bg-no-repeat p-0",
+                            )}
                         >
-                            {FaceIcon && <FaceIcon className="size-24" />}
-                            <span className="leading-tight">{face.label}</span>
+                            <span
+                                className={cn(
+                                    "flex flex-col items-center gap-6",
+                                    previewHref &&
+                                        "w-full bg-black/70 px-12 py-8",
+                                )}
+                            >
+                                {FaceIcon && <FaceIcon className="size-24" />}
+                                <span className="leading-tight">
+                                    {face.label}
+                                </span>
+                            </span>
                         </button>
                     </Html>
                 );
