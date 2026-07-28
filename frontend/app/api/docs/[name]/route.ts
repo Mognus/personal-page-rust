@@ -1,23 +1,12 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
-
 import { authApi } from "@/features/auth/lib/auth-api";
+import { loadDoc } from "@/lib/docs";
+import { getPdfPageCount, renderPdfPage } from "@/lib/pdf-render";
 
-// Whitelist: doc key → filename in the docs dir. The path is built ONLY from
-// this registry, never from the raw param — that blocks directory traversal.
-const DOCS: Record<string, string> = {
-    cv: "magnus-lebenslauf.pdf",
-    zeugnisse: "magnus-zeugnisse.pdf",
-    abilities: "magnus-abilities.pdf",
-};
-
-// Docs live outside public/. In prod, mount the folder and set DOCS_DIR.
-const DOCS_DIR = process.env.DOCS_DIR ?? "private";
-
-// Auth-gated document download: verifies the session against the backend, then
-// streams a whitelisted file. A direct URL hit without a valid session gets 401.
+// Auth-gated document access: verifies the session against the backend, then
+// either streams the raw PDF (download) or, with `?page=`, a rendered PNG of
+// one page (cube-face thumbnail / maximized viewer) — same gate, one file.
 export async function GET(
-    _request: Request,
+    request: Request,
     { params }: { params: Promise<{ name: string }> },
 ) {
     const me = await authApi.me();
@@ -26,23 +15,40 @@ export async function GET(
     }
 
     const { name } = await params;
-    const fileName = DOCS[name];
-    if (!fileName) {
+    const doc = await loadDoc(name);
+    if (!doc) {
         return new Response("Not found", { status: 404 });
     }
 
-    try {
-        const bytes = await readFile(
-            path.resolve(process.cwd(), DOCS_DIR, fileName),
-        );
-        return new Response(new Uint8Array(bytes), {
+    const { searchParams } = new URL(request.url);
+    const pageParam = searchParams.get("page");
+    if (pageParam === null) {
+        return new Response(new Uint8Array(doc.bytes), {
             headers: {
                 "Content-Type": "application/pdf",
-                "Content-Disposition": `inline; filename="${fileName}"`,
+                "Content-Disposition": `inline; filename="${doc.fileName}"`,
                 "Cache-Control": "private, no-store",
             },
         });
-    } catch {
-        return new Response("Document not available", { status: 404 });
     }
+
+    const pageNumber = Number(pageParam);
+    const pageCount = await getPdfPageCount(doc);
+    if (
+        !Number.isInteger(pageNumber) ||
+        pageNumber < 1 ||
+        pageNumber > pageCount
+    ) {
+        return new Response("Not found", { status: 404 });
+    }
+
+    const scale = Number(searchParams.get("scale") ?? "1.5") || 1.5;
+    const png = await renderPdfPage(doc, pageNumber, scale);
+    return new Response(new Uint8Array(png), {
+        headers: {
+            "Content-Type": "image/png",
+            "Cache-Control": "private, no-store",
+            "X-Page-Count": String(pageCount),
+        },
+    });
 }
