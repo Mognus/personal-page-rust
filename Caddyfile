@@ -1,0 +1,19 @@
+# Defaults to plain HTTP on :80 for a local production smoke test. Set
+# SITE_ADDRESS to the domain on the server for automatic HTTPS.
+{$SITE_ADDRESS::80} {
+	encode zstd gzip
+
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		-Server
+	}
+
+	reverse_proxy frontend:3000
+}
+
+# Keep www as a redirect to one canonical origin. The default dummy host avoids
+# requesting a certificate locally when WWW_ADDRESS is not configured.
+{$WWW_ADDRESS:www.localhost} {
+	redir https://{$SITE_ADDRESS}{uri} permanent
+}

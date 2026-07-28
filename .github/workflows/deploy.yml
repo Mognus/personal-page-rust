@@ -12,8 +12,8 @@ jobs:
       - uses: actions/checkout@v4
 
       # Secrets live on the server, never in the repo. Copy them into .env so
-      # docker compose picks them up (POSTGRES_*, JWT_SECRET, BACKEND_URL,
-      # GITHUB_*). Adjust the path if the env file is named differently.
+      # docker compose picks them up (SITE_ADDRESS, POSTGRES_*, JWT_SECRET,
+      # BACKEND_URL, GITHUB_*). Adjust the path if the env file is named differently.
       - name: Copy .env
         run: cp ~/personal-page.env .env
 

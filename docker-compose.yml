@@ -1,4 +1,25 @@
 services:
+  caddy:
+    image: caddy:2-alpine
+    container_name: ${PROJECT_NAME:-personal-page}-caddy
+    environment:
+      # ":80" locally; use the bare domain on the server for automatic HTTPS.
+      SITE_ADDRESS: ${SITE_ADDRESS:-:80}
+      # Configure only when the www DNS record exists.
+      WWW_ADDRESS: ${WWW_ADDRESS:-www.localhost}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      # Persist certificates to avoid reissuing them after container recreation.
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      frontend:
+        condition: service_healthy
+    restart: always
+
   postgres:
     image: postgres:18-alpine
     container_name: ${PROJECT_NAME:-personal-page}-postgres
@@ -74,12 +95,20 @@ services:
       # gitignored and never enter the repo or image. Defaults to the local
       # ./frontend/private for a plain `docker compose -f docker-compose.yml` run.
       - ${DOCS_DIR:-./frontend/private}:/docs:ro
-    ports:
-      # Only the frontend is published; nginx proxies the domain to it.
-      - "3000:3000"
+    # Documentation only: Caddy reaches this port over the compose network.
+    expose:
+      - "3000"
     depends_on:
       - backend
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/ >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
     restart: always
 
 volumes:
   postgres_data:
+  caddy_data:
+  caddy_config:

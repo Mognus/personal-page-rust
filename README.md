@@ -6,8 +6,8 @@ Content (projects, setup configs) lives in the DB and is managed via `/admin`;
 live file/repo content is pulled from GitHub.
 
 ```
-Browser ──/──► nginx ──► :3000 Next (BFF) ──► backend:8080 ──► Postgres
-                                  └──► api.github.com (live content)
+Browser ──/──► Caddy ──► frontend:3000 Next (BFF) ──► backend:8080 ──► Postgres
+                                      └──► api.github.com (live content)
 ```
 
 ## Dev
@@ -56,8 +56,27 @@ backs up the DB, rebuilds, and restarts the stack (`docker-compose.yml`).
 git push origin master            # triggers .github/workflows/deploy.yml
 ```
 
+Before the first Caddy deploy, add these values to `~/personal-page.env`:
+
+```env
+SITE_ADDRESS=freierfreier23.de
+WWW_ADDRESS=www.freierfreier23.de
+```
+
+Then free ports 80/443 on the server before the deploy starts:
+
+```bash
+sudo systemctl disable --now nginx
+```
+
+Keep Nginx installed until Caddy is healthy. After deployment, verify the site
+and `docker compose logs caddy`; only then remove the Nginx package if desired.
+
 Secrets live on the server in `~/personal-page.env` (see `.env.example`), never
-in the repo. Seed data lives off-repo too, at `SEEDS_DIR` (mounted at `/seeds`).
+in the repo. Set `SITE_ADDRESS=freierfreier23.de`; set
+`WWW_ADDRESS=www.freierfreier23.de` only while that DNS record exists. Caddy
+obtains and renews HTTPS certificates automatically. Seed data lives off-repo
+too, at `SEEDS_DIR` (mounted at `/seeds`).
 
 Seed once after the first deploy:
 
@@ -89,7 +108,7 @@ DB backups are written before every deploy to `~/backups/db-<timestamp>.sql.gz`
 
 | Where | What |
 |-------|------|
-| `.env` / `~/personal-page.env` | DB, JWT, `BACKEND_URL`, `GITHUB_*`, `SEEDS_DIR`, `DOCS_DIR` — see `.env.example` |
+| `.env` / `~/personal-page.env` | Caddy domain, DB, JWT, `BACKEND_URL`, `GITHUB_*`, `SEEDS_DIR`, `DOCS_DIR` — see `.env.example` |
 | `backend/seeds/*.json` | seed content (gitignored; `*.example` tracked) |
 | `frontend/private/*.pdf` | private docs for `/api/docs` (gitignored; mounted via `DOCS_DIR`) |
-| `nginx.conf.example` | reverse proxy (`/` → `:3000`) |
+| `Caddyfile` | HTTPS reverse proxy (`/` → `frontend:3000`) |
