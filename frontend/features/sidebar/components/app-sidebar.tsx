@@ -4,10 +4,10 @@ import { SidebarBrand } from "@/features/sidebar/components/sidebar-brand";
 import { links } from "@/features/sidebar/lib/links";
 import { cn } from "@/lib/utils";
 
-// Content-driven sidebar: the aside shrinks to its widest child (the brand),
-// so the divider and links line up against that width. `isOpen` collapses it
-// to zero width (overflow clipped) for the toggle. justify-between pushes the
-// user section to the bottom.
+// Content-driven sidebar: the aside shrinks to its widest child, so the divider
+// and links line up against that width. `isOpen` collapses it to zero width
+// (overflow clipped) for the toggle. justify-between pushes the user section to
+// the bottom.
 export function AppSidebar({ isOpen }: { isOpen: boolean }) {
     return (
         <aside
@@ -17,10 +17,13 @@ export function AppSidebar({ isOpen }: { isOpen: boolean }) {
             )}
         >
             <div className="flex flex-col">
+                {/* self-center: the brand box has a fixed width, so it would
+                    stick to the left whenever a nav label is wider than it
+                    (e.g. the German "Persönliches Setup"). */}
                 <SidebarBrand
                     targetW={300}
                     targetH={150}
-                    className="relative flex items-center justify-center rounded"
+                    className="relative flex items-center justify-center self-center rounded"
                 />
                 <div className="mx-5 mb-6 h-px w-1/2 bg-foreground" />
                 <NavSidebarLinks items={links} className="ml-2 px-5" />
