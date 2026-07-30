@@ -32,6 +32,7 @@
         "topics": "Topics",
         "noTopics": "No topics",
         "viewRepository": "View Repository",
+        "live": "Live",
         "unknown": "Unknown"
     },
     "ContentRenderer": {

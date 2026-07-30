@@ -32,6 +32,7 @@
         "topics": "Themen",
         "noTopics": "Keine Themen",
         "viewRepository": "Repository öffnen",
+        "live": "Live",
         "unknown": "Unbekannt"
     },
     "ContentRenderer": {

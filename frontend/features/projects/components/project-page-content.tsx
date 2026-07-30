@@ -68,17 +68,20 @@ export function ProjectPageContent({
             <div ref={sizerRef} className="flex flex-col gap-4">
                 <div className="flex items-start justify-between gap-4">
                     <Text variant="eyebrow">{label}</Text>
-                    {/* Fixed to the header so it stays reachable even if the
+                    {/* Fixed to the header so they stay reachable even if the
                         content below scrolls. */}
-                    <a
-                        className="flex shrink-0 items-center gap-1 text-xs uppercase tracking-widest text-blue-500 hover:underline"
-                        href={repository.html_url}
-                        rel="noreferrer"
-                        target="_blank"
-                    >
-                        {t("viewRepository")}
-                        <ExternalLink className="size-3.5" strokeWidth={1.5} />
-                    </a>
+                    <div className="flex shrink-0 items-center gap-4">
+                        {/* GitHub's "Website" field. Unset repos return null or
+                            an empty string, so both are falsy — no link then. */}
+                        {repository.homepage && (
+                            <ExternalAnchor href={repository.homepage}>
+                                {t("live")}
+                            </ExternalAnchor>
+                        )}
+                        <ExternalAnchor href={repository.html_url}>
+                            {t("viewRepository")}
+                        </ExternalAnchor>
+                    </div>
                 </div>
 
                 {view === "readme" ? (
@@ -118,6 +121,27 @@ export function ProjectPageContent({
                 </div>
             </div>
         </div>
+    );
+}
+
+// Header link out of the card — same look for the live site and the repository.
+function ExternalAnchor({
+    href,
+    children,
+}: {
+    href: string;
+    children: React.ReactNode;
+}) {
+    return (
+        <a
+            className="flex items-center gap-1 text-xs uppercase tracking-widest text-blue-500 hover:underline"
+            href={href}
+            rel="noreferrer"
+            target="_blank"
+        >
+            {children}
+            <ExternalLink className="size-3.5" strokeWidth={1.5} />
+        </a>
     );
 }
 
