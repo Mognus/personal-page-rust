@@ -1,6 +1,9 @@
 import "server-only";
 
 import { createCanvas } from "@napi-rs/canvas";
+// Register PDF.js's in-process worker explicitly. Besides avoiding a dynamic
+// runtime import, this gives Next's standalone tracer a real dependency edge.
+import "pdfjs-dist/legacy/build/pdf.worker.mjs";
 // Legacy build: no DOM/Worker assumptions, works in a plain Node route handler.
 // It auto-detects Node and rasterizes glyphs via its own @napi-rs/canvas
 // binding internally — we only need to supply the final-page canvas ourselves.
