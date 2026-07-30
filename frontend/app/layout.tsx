@@ -22,7 +22,7 @@ const syne = Syne({
 });
 
 export const metadata: Metadata = {
-    title: "Magnus Eschrich",
+    title: "FreierFreier23",
     description: "Personal website",
 };
 
