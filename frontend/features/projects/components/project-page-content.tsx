@@ -60,7 +60,12 @@ export function ProjectPageContent({
             )}
             style={{ height }}
         >
-            <div ref={sizerRef} className="grid gap-4">
+            {/* flex-col, not grid: a grid's auto track cannot shrink below its
+                items' min-content, so a wide code block would widen the whole
+                card and push the header link out of the clipped box. Flex items
+                just stretch to the container width, which keeps the scrolling
+                inside the README pane. */}
+            <div ref={sizerRef} className="flex flex-col gap-4">
                 <div className="flex items-start justify-between gap-4">
                     <Text variant="eyebrow">{label}</Text>
                     {/* Fixed to the header so it stays reachable even if the
