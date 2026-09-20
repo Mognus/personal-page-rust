@@ -4,7 +4,7 @@ import { highlightCode } from "@/components/content-renderer/highlight-code";
 import { renderMarkdownToHtml } from "@/components/content-renderer/render-markdown";
 import { ConfigFileView } from "@/features/setup/components/file-view/config-file-view";
 import { ConfigFolderState } from "@/features/setup/components/file-view/config-folder-state";
-import { getVisibleConfigs } from "@/features/setup/lib/configs";
+import { configs } from "@/features/setup/lib/configs";
 import { getDotfilesFileContent } from "@/lib/github";
 
 interface ConfigFilePageProps {
@@ -14,7 +14,6 @@ interface ConfigFilePageProps {
 }
 
 export async function ConfigFilePage({ slug, file }: ConfigFilePageProps) {
-    const configs = await getVisibleConfigs();
     const config = configs.find((item) => item.slug === slug);
 
     if (!config) notFound();

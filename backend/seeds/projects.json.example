@@ -1,9 +1,0 @@
-[
-    { "slug": "dotfiles", "full_name": "Mognus/linux-dotfiles", "label": "Dotfiles", "position": 0 },
-    { "slug": "personal-blog", "full_name": "Mognus/personal-blog", "label": "Personal Blog", "position": 1 },
-    { "slug": "auth-service", "full_name": "Mognus/auth-service", "label": "Auth Service", "position": 2 },
-    { "slug": "latex-application-template", "full_name": "Mognus/latex-application-template", "label": "LaTeX Application Template", "position": 3 },
-    { "slug": "interactive-movie-berlin-students", "full_name": "Mognus/interactive-movie-berlin-students", "label": "Interactive Movie Berlin", "position": 4 },
-    { "slug": "personal-page-rust", "full_name": "Mognus/personal-page-rust", "label": "Personal Page Rust", "position": 5 },
-    { "slug": "schnur23", "full_name": "Mognus/schnur23-page", "label": "Schnur23", "position": 6 }
-]

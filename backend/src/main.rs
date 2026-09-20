@@ -1,13 +1,11 @@
 mod auth;
 mod app;
 mod config;
-mod configs;
 mod db;
 mod error;
 mod health;
 mod listing;
 mod pagination;
-mod projects;
 mod state;
 mod users;
 

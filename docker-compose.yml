@@ -69,11 +69,6 @@ services:
       JWT_EXPIRES_IN_SECONDS: ${JWT_EXPIRES_IN_SECONDS:-3600}
     # No host port: the frontend BFF reaches it as http://backend:8080 over the
     # compose network; the browser never talks to it directly.
-    volumes:
-      # Off-repo seed data for the seed_* bins, read-only. Point SEEDS_DIR at the
-      # server folder holding configs.json / projects.json; then e.g.
-      # docker exec ${PROJECT_NAME}-backend seed_configs --file /seeds/configs.json
-      - ${SEEDS_DIR:-./backend/seeds}:/seeds:ro
     depends_on:
       migrate:
         condition: service_completed_successfully

@@ -2,8 +2,9 @@
 
 Personal website. **Rust/axum** backend + **Postgres**, **Next.js** frontend
 (BFF — the browser only talks to Next, which reaches the backend internally).
-Content (projects, setup configs) lives in the DB and is managed via `/admin`;
-live file/repo content is pulled from GitHub.
+The curated lists (projects, setup configs) are static arrays in the frontend;
+the DB holds accounts only, managed via `/admin`. Everything displayed — repo
+metadata, READMEs, dotfiles — is pulled live from GitHub.
 
 ```
 Browser ──/──► Caddy ──► frontend:3000 Next (BFF) ──► backend:8080 ──► Postgres
@@ -23,26 +24,17 @@ docker compose -f docker-compose.dev.yml up
 #   postgres  localhost:5432
 ```
 
-Seed data (one-time, run from `backend/`, DB up). The seed files are off-repo —
-copy the templates first:
+Seed the accounts (one-time, run from `backend/`, DB up):
 
 ```bash
 cd backend
-cp seeds/configs.json.example  seeds/configs.json
-cp seeds/projects.json.example seeds/projects.json
-
 cargo run --bin seed_users        # admin@example.com / secret-password (+ friend, user)
-cargo run --bin seed_configs      # reads seeds/configs.json
-cargo run --bin seed_projects     # reads seeds/projects.json
 ```
 
-Re-running a seeder **upserts** (updates by slug, never deletes). To also remove
-rows no longer in the seed file — e.g. a dropped config — add `--clean`; it lists
-what it would delete and asks first (`seed_users` has no `--clean`):
-
-```bash
-cargo run --bin seed_configs -- --clean
-```
+The projects and the personal-setup entries are not seeded: they are static
+lists in `frontend/features/projects/lib/projects.ts` and
+`frontend/features/setup/lib/configs.ts`. Edit the array to add, reorder or
+remove one.
 
 Then open `http://localhost:3000` and sign in at `/login` with
 `admin@example.com` / `secret-password`.
@@ -78,22 +70,12 @@ in the repo. Set `SITE_ADDRESS=luxxer23.de` — one canonical host, because it i
 also the redirect target. `WWW_ADDRESS` and `OLD_SITE_ADDRESS` each take a
 comma-separated list of hosts that redirect there; set `WWW_ADDRESS` only while
 that DNS record exists. Caddy obtains and renews HTTPS certificates
-automatically. Seed data lives off-repo
-too, at `SEEDS_DIR` (mounted at `/seeds`).
+automatically.
 
-Seed once after the first deploy:
+Seed the admin account once after the first deploy:
 
 ```bash
 docker exec personal-page-backend seed_users --email you@example.com --password 'secret' --role admin
-docker exec personal-page-backend seed_configs  --file /seeds/configs.json
-docker exec personal-page-backend seed_projects --file /seeds/projects.json
-```
-
-`--clean` works here too, but `docker exec` has no TTY for the prompt — pair it
-with `--yes` to confirm non-interactively:
-
-```bash
-docker exec personal-page-backend seed_configs --file /seeds/configs.json --clean --yes
 ```
 
 Private documents (CV / references) are served off-repo too — they are
@@ -111,7 +93,7 @@ DB backups are written before every deploy to `~/backups/db-<timestamp>.sql.gz`
 
 | Where | What |
 |-------|------|
-| `.env` / `~/personal-page.env` | Caddy domain, DB, JWT, `BACKEND_URL`, `GITHUB_*`, `SEEDS_DIR`, `DOCS_DIR` — see `.env.example` |
-| `backend/seeds/*.json` | seed content (gitignored; `*.example` tracked) |
+| `.env` / `~/personal-page.env` | Caddy domain, DB, JWT, `BACKEND_URL`, `GITHUB_*`, `DOCS_DIR` — see `.env.example` |
+| `frontend/features/*/lib/{projects,configs}.ts` | the curated project + setup lists |
 | `frontend/private/*.pdf` | private docs for `/api/docs` (gitignored; mounted via `DOCS_DIR`) |
 | `Caddyfile` | HTTPS reverse proxy (`/` → `frontend:3000`) |

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { highlightCode } from "@/components/content-renderer/highlight-code";
 import { renderMarkdownToHtml } from "@/components/content-renderer/render-markdown";
 import { ProjectPageContent } from "@/features/projects/components/project-page-content";
-import { getVisibleProjects } from "@/features/projects/lib/projects";
+import { projects } from "@/features/projects/lib/projects";
 import {
     getRepository,
     getRepositoryFileContent,
@@ -16,7 +16,6 @@ interface ProjectPageProps {
 
 export async function ProjectPage({ project }: ProjectPageProps) {
     // Resolve slug → repo via the curated list (shares the layout's cached fetch).
-    const projects = await getVisibleProjects();
     const projectConfig = projects.find((item) => item.slug === project);
 
     if (!projectConfig) notFound();

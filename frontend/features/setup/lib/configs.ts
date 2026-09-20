@@ -1,34 +1,40 @@
-import "server-only";
-
-import { cache } from "react";
-
-import { callApi } from "@/lib/api";
-
-// Mirrors the backend ConfigResponse: a curation pointer to a dotfiles folder
-// plus presentation (label/icon). File contents are fetched from GitHub.
+// Curation pointers into the dotfiles repo: which folder to show and how to
+// label it. The file contents themselves are fetched from GitHub at request
+// time, so nothing here needs to be stored or edited at runtime.
+//
+// Array order is the display order, and an entry is shown precisely because it
+// is listed — that replaces the `position` and `visible` columns this used to
+// carry. `icon` is a lucide name resolved by ICON_MAP in config-button.tsx;
+// an unknown name falls back to Package rather than breaking the grid.
 export interface Config {
-    id: string;
     slug: string;
     label: string;
     icon: string;
     path: string;
-    position: number;
-    visible: boolean;
-    created_at: string;
-    updated_at: string;
 }
 
-interface PaginatedConfigs {
-    items: Config[];
-    total: number;
-}
-
-// Cached per request so the layout and the [config] page share one fetch.
-// Public, visible-only, ordered by position server-side.
-export const getVisibleConfigs = cache(async (): Promise<Config[]> => {
-    const res = await callApi<PaginatedConfigs>(
-        "/configs?visible=true&page_size=100",
-        { auth: false },
-    );
-    return res.items;
-});
+export const configs: Config[] = [
+    { slug: "hyprland", label: "Hyprland", icon: "Monitor", path: ".config/hypr" },
+    {
+        slug: "alacritty",
+        label: "Alacritty",
+        icon: "SquareTerminal",
+        path: ".config/alacritty",
+    },
+    { slug: "neovim", label: "Neovim", icon: "Code2", path: ".config/nvim" },
+    { slug: "shell", label: "Shell", icon: "Terminal", path: ".config/fish" },
+    { slug: "tmux", label: "Tmux", icon: "PanelsTopLeft", path: ".config/tmux" },
+    {
+        slug: "notifications",
+        label: "Notifications",
+        icon: "Bell",
+        path: ".config/dunst",
+    },
+    {
+        slug: "quickshell",
+        label: "Quickshell",
+        icon: "Layers",
+        path: ".config/quickshell",
+    },
+    { slug: "tools", label: "Tools", icon: "Package", path: ".config/tools" },
+];
