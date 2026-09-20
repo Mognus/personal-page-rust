@@ -22,14 +22,9 @@ export const configs: Config[] = [
         path: ".config/alacritty",
     },
     { slug: "neovim", label: "Neovim", icon: "Code2", path: ".config/nvim" },
-    { slug: "shell", label: "Shell", icon: "Terminal", path: ".config/fish" },
+    { slug: "zed", label: "Zed", icon: "PanelTop", path: ".config/zed" },
     { slug: "tmux", label: "Tmux", icon: "PanelsTopLeft", path: ".config/tmux" },
-    {
-        slug: "notifications",
-        label: "Notifications",
-        icon: "Bell",
-        path: ".config/dunst",
-    },
+    { slug: "shell", label: "Shell", icon: "Terminal", path: ".config/fish" },
     {
         slug: "quickshell",
         label: "Quickshell",
