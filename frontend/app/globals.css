@@ -145,6 +145,125 @@
     }
 }
 
+/* The brand mascots rising out from behind the emblem number and sinking back.
+   Their container is clipped at the top edge of the digits, so translating past
+   100% hides them completely -- including through the open counters of the
+   glyphs, which a z-index alone would leave them visible through.
+
+   Percentages in translate resolve against the element's own height, so 110%
+   drops it just past the bottom of its 1:1-sized clip box; 0% is the resting
+   pose with the feet on the cut line.
+
+   One 22s cycle: devil, angel, devil again, then both -- angel first, devil
+   following, the angel startled, and the two leaving in the order they came. */
+@keyframes mascot-peek-devil {
+    0%,
+    4% {
+        transform: translateY(110%);
+    }
+    7%,
+    14% {
+        transform: translateY(0);
+    }
+    17%,
+    36% {
+        transform: translateY(110%);
+    }
+    39%,
+    46% {
+        transform: translateY(0);
+    }
+    49%,
+    60% {
+        transform: translateY(110%);
+    }
+    /* Joins the angel, and stays until after he has fled. */
+    63%,
+    88% {
+        transform: translateY(0);
+    }
+    92%,
+    100% {
+        transform: translateY(110%);
+    }
+}
+
+@keyframes mascot-peek-angel {
+    0%,
+    20% {
+        transform: translateY(110%);
+    }
+    23%,
+    30% {
+        transform: translateY(0);
+    }
+    33%,
+    54% {
+        transform: translateY(110%);
+    }
+    /* Up first at the meeting, gone first once he has seen the company. */
+    57%,
+    80% {
+        transform: translateY(0);
+    }
+    84%,
+    100% {
+        transform: translateY(110%);
+    }
+}
+
+/* The angel's sub-animation: a glance right, a glance left, each held for a
+   beat. It has to live on a nested element, because this drives transform too
+   and one element cannot run two animations on one property.
+   scaleX(-1) mirrors him; stepped timing makes the turn instant instead of
+   scaling him through zero. */
+@keyframes mascot-fret {
+    0%,
+    64% {
+        transform: translateX(0) scaleX(1);
+    }
+    67% {
+        transform: translateX(-2px) scaleX(-1);
+    }
+    71% {
+        transform: translateX(2px) scaleX(1);
+    }
+    74% {
+        transform: translateX(-2px) scaleX(-1);
+    }
+    77% {
+        transform: translateX(2px) scaleX(1);
+    }
+    79%,
+    100% {
+        transform: translateX(0) scaleX(1);
+    }
+}
+
+.mascot-peek-devil {
+    animation: mascot-peek-devil 22s ease-in-out infinite;
+}
+
+.mascot-peek-angel {
+    animation: mascot-peek-angel 22s ease-in-out infinite;
+}
+
+.mascot-fret {
+    /* Same duration as the peek, so the two timelines stay aligned. steps(1)
+       holds each pose and snaps to the next one. */
+    animation: mascot-fret 22s steps(1, end) infinite;
+    transform-origin: 50% 90%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .mascot-peek-devil,
+    .mascot-peek-angel,
+    .mascot-fret {
+        animation: none;
+        transform: none;
+    }
+}
+
 /* Rotating enso ring on the projects page. counter-spin keeps the orbiting
    cards upright; spin-paused freezes both when a project is open. */
 @keyframes spin {

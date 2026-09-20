@@ -52,34 +52,52 @@ export function SidebarBrand({
                 className={titleClassName}
             />
 
-            {/* One stands behind each digit of the number. The negative
-                z-index is what sells it: the glyphs paint over the feet, so the
-                two look like they are standing behind the number rather than on
-                top of it. Offsets are measured from the bottom right of the
-                box, which is where the number sits.
-                unoptimized keeps the GIFs animating. */}
+            {/* One rises behind each digit of the number. Each sits in a box
+                clipped at the top edge of the digits, so sliding past the
+                bottom hides it completely. A z-index would not be enough: the
+                glyphs are outlines, and anything sunk behind them would still
+                show through the counters of the 2 and the 3.
+
+                Offsets are measured from the bottom right of the box, which is
+                where the number sits; the box dimensions match the rendered GIF
+                so nothing sticks out sideways. Each has its own keyframes: they
+                appear alone in turn and meet once per cycle.
+                unoptimized keeps them animating. */}
             {mascots && (
                 <>
-                    <Image
-                        src="/tux-devil.gif"
-                        alt=""
-                        width={103}
-                        height={100}
-                        unoptimized
+                    <span
                         aria-hidden
-                        className="pointer-events-none absolute -z-10 h-6 w-auto select-none"
-                        style={{ right: 22, bottom: 14 }}
-                    />
-                    <Image
-                        src="/tux-angel.gif"
-                        alt=""
-                        width={93}
-                        height={100}
-                        unoptimized
+                        className="pointer-events-none absolute -z-10 overflow-hidden"
+                        style={{ right: 22, bottom: 14, width: 25, height: 24 }}
+                    >
+                        <Image
+                            src="/tux-devil.gif"
+                            alt=""
+                            width={103}
+                            height={100}
+                            unoptimized
+                            className="mascot-peek-devil h-6 w-auto select-none"
+                        />
+                    </span>
+                    <span
                         aria-hidden
-                        className="pointer-events-none absolute -z-10 h-6 w-auto select-none"
-                        style={{ right: 0, bottom: 14 }}
-                    />
+                        className="pointer-events-none absolute -z-10 overflow-hidden"
+                        style={{ right: 0, bottom: 14, width: 22, height: 24 }}
+                    >
+                        {/* Two elements, because the rocking is a transform as
+                            well and one element runs only one animation per
+                            property: the outer one lifts, the inner one frets. */}
+                        <span className="mascot-peek-angel block">
+                            <Image
+                                src="/tux-angel.gif"
+                                alt=""
+                                width={93}
+                                height={100}
+                                unoptimized
+                                className="mascot-fret h-6 w-auto select-none"
+                            />
+                        </span>
+                    </span>
                 </>
             )}
         </ShockwaveWrapper>
