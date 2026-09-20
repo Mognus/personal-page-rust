@@ -59,8 +59,9 @@ git push origin master            # triggers .github/workflows/deploy.yml
 Before the first Caddy deploy, add these values to `~/personal-page.env`:
 
 ```env
-SITE_ADDRESS=freierfreier23.de
-WWW_ADDRESS=www.freierfreier23.de
+SITE_ADDRESS=luxxer23.de
+WWW_ADDRESS=www.luxxer23.de
+OLD_SITE_ADDRESS=freierfreier23.de, www.freierfreier23.de
 ```
 
 Then free ports 80/443 on the server before the deploy starts:
@@ -73,9 +74,11 @@ Keep Nginx installed until Caddy is healthy. After deployment, verify the site
 and `docker compose logs caddy`; only then remove the Nginx package if desired.
 
 Secrets live on the server in `~/personal-page.env` (see `.env.example`), never
-in the repo. Set `SITE_ADDRESS=freierfreier23.de`; set
-`WWW_ADDRESS=www.freierfreier23.de` only while that DNS record exists. Caddy
-obtains and renews HTTPS certificates automatically. Seed data lives off-repo
+in the repo. Set `SITE_ADDRESS=luxxer23.de` — one canonical host, because it is
+also the redirect target. `WWW_ADDRESS` and `OLD_SITE_ADDRESS` each take a
+comma-separated list of hosts that redirect there; set `WWW_ADDRESS` only while
+that DNS record exists. Caddy obtains and renews HTTPS certificates
+automatically. Seed data lives off-repo
 too, at `SEEDS_DIR` (mounted at `/seeds`).
 
 Seed once after the first deploy:

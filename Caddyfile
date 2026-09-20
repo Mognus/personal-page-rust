@@ -12,8 +12,19 @@
 	reverse_proxy frontend:3000
 }
 
-# Keep www as a redirect to one canonical origin. The default dummy host avoids
-# requesting a certificate locally when WWW_ADDRESS is not configured.
+# SITE_ADDRESS above is the single canonical origin; it is also the redirect
+# target below, so it must stay one host. Everything else redirects to it.
+#
+# Both variables below take a comma-separated list of hosts. Their dummy
+# defaults keep Caddy from requesting certificates locally when they are unset.
+
+# The www hosts.
 {$WWW_ADDRESS:www.localhost} {
+	redir https://{$SITE_ADDRESS}{uri} permanent
+}
+
+# Former domains. Their links live on in documents already out of our hands, so
+# they keep answering long after a move instead of being dropped.
+{$OLD_SITE_ADDRESS:old.localhost} {
 	redir https://{$SITE_ADDRESS}{uri} permanent
 }

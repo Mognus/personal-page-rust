@@ -5,8 +5,10 @@ services:
     environment:
       # ":80" locally; use the bare domain on the server for automatic HTTPS.
       SITE_ADDRESS: ${SITE_ADDRESS:-:80}
-      # Configure only when the www DNS record exists.
+      # Both take a comma-separated list of hosts that redirect to SITE_ADDRESS.
+      # Configure WWW_ADDRESS only when the www DNS record exists.
       WWW_ADDRESS: ${WWW_ADDRESS:-www.localhost}
+      OLD_SITE_ADDRESS: ${OLD_SITE_ADDRESS:-old.localhost}
     ports:
       - "80:80"
       - "443:443"
