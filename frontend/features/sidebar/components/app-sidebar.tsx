@@ -1,7 +1,7 @@
 import { SidebarUser } from "@/features/auth/components/sidebar-user";
 import { NavSidebarLinks } from "@/features/sidebar/components/nav-sidebar-links";
 import { SidebarBrand } from "@/features/sidebar/components/sidebar-brand";
-import { links } from "@/features/sidebar/lib/links";
+import { navGroups } from "@/features/sidebar/lib/links";
 import { cn } from "@/lib/utils";
 
 // Content-driven sidebar: the aside shrinks to its widest child, so the divider
@@ -26,7 +26,7 @@ export function AppSidebar({ isOpen }: { isOpen: boolean }) {
                     className="relative flex items-center justify-center self-center rounded"
                 />
                 <div className="mx-5 mb-6 h-px w-1/2 bg-foreground" />
-                <NavSidebarLinks items={links} className="ml-2 px-5" />
+                <NavSidebarLinks groups={navGroups} className="ml-2 px-5" />
             </div>
             <SidebarUser
                 className="border-t border-foreground/40 px-5 py-4"

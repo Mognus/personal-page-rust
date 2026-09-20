@@ -9,7 +9,7 @@ import { NavSidebarLinks } from "@/features/sidebar/components/nav-sidebar-links
 import { SidebarBrand } from "@/features/sidebar/components/sidebar-brand";
 import { SidebarToggle } from "@/features/sidebar/components/sidebar-toggle";
 import { SocialBar } from "@/features/sidebar/components/social-bar";
-import { links } from "@/features/sidebar/lib/links";
+import { navGroups } from "@/features/sidebar/lib/links";
 import { SOCIALS } from "@/features/sidebar/lib/socials";
 import { useSidebar } from "@/features/sidebar/store/sidebar";
 import { useViewportSize } from "@/hooks/use-media-query";
@@ -47,7 +47,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
                     {/* Top-anchored so the gear hangs under the last nav item
                         and the settings panel drops down below it. */}
                     <div className="fixed top-1/2 left-[5vw] z-50 flex flex-col gap-6">
-                        <NavSidebarLinks items={links} />
+                        <NavSidebarLinks groups={navGroups} />
                         <div className="flex flex-col gap-3">
                             <SidebarUser align="start" />
                             <SettingsPanelCompact className="border-l border-foreground/40 pl-3" />

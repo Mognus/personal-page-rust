@@ -1,14 +1,29 @@
-// Navigation links rendered by the sidebar. `labelKey` is a key under the
-// "Nav" message namespace; NavSidebarLinks resolves it to the active locale.
+// Navigation rendered by the sidebar. `labelKey` is a key under the "Nav"
+// message namespace; NavSidebarLinks resolves it to the active locale.
+//
+// The nav is a list of groups rather than a flat list: each group heading is
+// itself a link, and its children are indented behind a rule that marks them as
+// belonging to it. A group without children is just a heading.
 export type NavLink = {
     href: string;
     labelKey: string;
-    // Nested under a parent entry (e.g. Home) — rendered slightly indented.
-    indent?: boolean;
 };
 
-export const links: NavLink[] = [
-    { href: "/", labelKey: "home" },
-    { href: "/projects", labelKey: "projects", indent: true },
-    { href: "/personal-setup", labelKey: "personalSetup", indent: true },
+export type NavGroup = NavLink & {
+    children?: NavLink[];
+};
+
+export const navGroups: NavGroup[] = [
+    {
+        href: "/",
+        labelKey: "home",
+        children: [
+            { href: "/projects", labelKey: "projects" },
+            { href: "/personal-setup", labelKey: "personalSetup" },
+        ],
+    },
+    {
+        href: "/blog",
+        labelKey: "blog",
+    },
 ];

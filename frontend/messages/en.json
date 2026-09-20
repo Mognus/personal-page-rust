@@ -2,7 +2,8 @@
     "Nav": {
         "home": "Home",
         "projects": "Projects",
-        "personalSetup": "Personal Setup"
+        "personalSetup": "Personal Setup",
+        "blog": "Blog"
     },
     "Settings": {
         "title": "Settings",
@@ -51,5 +52,9 @@
         "back": "Back to setup",
         "copy": "Copy",
         "copied": "Copied"
+    },
+    "Blog": {
+        "title": "Blog",
+        "comingSoon": "Coming soon"
     }
 }
