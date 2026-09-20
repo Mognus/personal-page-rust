@@ -6,8 +6,6 @@ import { SidebarTitle } from "@/features/sidebar/components/sidebar-title";
 interface SidebarBrandProps {
     targetW: number;
     targetH: number;
-    innerW?: number;
-    innerH?: number;
     waves?: number;
     duration?: number;
     gap?: number;
@@ -21,21 +19,19 @@ interface SidebarBrandProps {
 export function SidebarBrand({
     targetW,
     targetH,
-    innerW = 195.6,
-    innerH = 55,
     waves,
     duration,
-    gap,
+    // The box hugs the title, so without a gap the innermost ring would sit
+    // right against the letters.
+    gap = 5,
     staticBorder,
     className = "relative flex items-center justify-center",
-    title = "LUX\nXER JR",
+    title = "LUX\nXER 23",
     href = "/",
     titleClassName,
 }: SidebarBrandProps) {
     return (
         <ShockwaveWrapper
-            innerW={innerW}
-            innerH={innerH}
             targetW={targetW}
             targetH={targetH}
             waves={waves}
