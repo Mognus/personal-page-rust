@@ -23,6 +23,7 @@ export function AppSidebar({ isOpen }: { isOpen: boolean }) {
                 <SidebarBrand
                     targetW={300}
                     targetH={150}
+                    mascots
                     className="relative flex items-center justify-center self-center rounded"
                 />
                 <div className="mx-5 mb-6 h-px w-1/2 bg-foreground" />

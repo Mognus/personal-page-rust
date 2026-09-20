@@ -42,6 +42,7 @@ export function MobileShell({ children }: { children: React.ReactNode }) {
                             duration={3}
                             gap={10}
                             staticBorder
+                            mascots
                         />
                     </div>
                     {/* Top-anchored so the gear hangs under the last nav item
