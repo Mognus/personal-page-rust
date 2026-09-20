@@ -61,7 +61,7 @@ Before the first Caddy deploy, add these values to `~/personal-page.env`:
 ```env
 SITE_ADDRESS=luxxer23.de
 WWW_ADDRESS=www.luxxer23.de
-OLD_SITE_ADDRESS=freierfreier23.de, www.freierfreier23.de
+OLD_SITE_ADDRESS="freierfreier23.de, www.freierfreier23.de"
 ```
 
 Then free ports 80/443 on the server before the deploy starts:
