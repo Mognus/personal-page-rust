@@ -28,7 +28,7 @@ export function SidebarBrand({
     gap,
     staticBorder,
     className = "relative flex items-center justify-center",
-    title = "FREIER\nFREIER23",
+    title = "LUX\nXER JR",
     href = "/",
     titleClassName,
 }: SidebarBrandProps) {
