@@ -23,9 +23,9 @@ export const projects: Project[] = [
         label: "LaTeX Application Template",
     },
     {
-        slug: "application-typst",
-        full_name: "Mognus/application-typst",
-        label: "Application Typst",
+        slug: "typst-application-template",
+        full_name: "Mognus/typst-application-template",
+        label: "Typst Application Template",
     },
     {
         slug: "interactive-movie-berlin-students",
