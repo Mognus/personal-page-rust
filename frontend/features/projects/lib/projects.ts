@@ -23,6 +23,11 @@ export const projects: Project[] = [
         label: "LaTeX Application Template",
     },
     {
+        slug: "application-typst",
+        full_name: "Mognus/application-typst",
+        label: "Application Typst",
+    },
+    {
         slug: "interactive-movie-berlin-students",
         full_name: "Mognus/interactive-movie-berlin-students",
         label: "Interactive Movie Berlin",
