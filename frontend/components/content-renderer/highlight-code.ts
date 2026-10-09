@@ -11,7 +11,6 @@ const LANGUAGE_BY_FILE_NAME: Record<string, BundledLanguage> = {
     ".gitconfig": "ini",
     ".tmux.conf": "bash",
     ".zshrc": "zsh",
-    dunstrc: "ini",
     qmldir: "qml",
     "tmux.conf": "bash",
 };
